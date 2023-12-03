@@ -20,4 +20,5 @@ public interface GradeRepository extends JpaRepository<Grade, Integer> {
     @Query(value = "SELECT MAX(grades.level) FROM grades WHERE grades.rut =:rut", nativeQuery = true)
     Integer getMaxLevelByRut(@Param("rut") String rut);
 
+
 }

@@ -49,4 +49,8 @@ public class CareerService {
             return null;
         }
     }
+
+    public Career findById_career(Integer id_career){
+        return careerRepository.findById_career(id_career);
+    }
 }

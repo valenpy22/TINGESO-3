@@ -41,6 +41,8 @@ public class StudyPlanService {
                     studyPlan.setLevel((int)row.getCell(2).getNumericCellValue());
                     studyPlan.setId_subject((int)row.getCell(3).getNumericCellValue());
                     studyPlan.setSubject_name(row.getCell(4).getStringCellValue());
+                    studyPlan.setMax_number_students((int) Math.random()*(75-25+1)+25);
+                    studyPlan.setNumber_students(0);
 
                     studyPlans.add(studyPlan);
                 }
@@ -59,4 +61,13 @@ public class StudyPlanService {
     public StudyPlan getStudyPlanById_subject(Integer id_subject){
         return studyPlanRepository.getStudyPlanById_subject(id_subject);
     }
+
+    public Integer getStudyPlanLevelById_subject(Integer id_subject){
+        return studyPlanRepository.getStudyPlanLevelById_Subject(id_subject);
+    }
+
+    public Integer countByLevelAndAndId_career(Integer level, Integer id_career){
+        return studyPlanRepository.countByLevelAndAndId_career(level, id_career);
+    }
+
 }

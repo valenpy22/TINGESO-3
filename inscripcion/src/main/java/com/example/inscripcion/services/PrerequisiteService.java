@@ -52,4 +52,8 @@ public class PrerequisiteService {
             return null;
         }
     }
+
+    public List<Prerequisite> findById_subject(Integer id_subject){
+        return prerequisiteRepository.findById_subject(id_subject);
+    }
 }

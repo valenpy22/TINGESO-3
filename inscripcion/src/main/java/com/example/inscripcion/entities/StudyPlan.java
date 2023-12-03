@@ -19,4 +19,6 @@ public class StudyPlan {
     private Integer level;
     private Integer id_subject;
     private String subject_name;
+    private Integer max_number_students;
+    private Integer number_students;
 }

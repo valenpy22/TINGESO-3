@@ -19,4 +19,5 @@ public class Student {
     private String student_lastname;
     private String email;
     private Integer id_career;
+    private String status;
 }
