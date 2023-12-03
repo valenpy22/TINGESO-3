@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Table, Modal, Container, Row, Col } from 'react-bootstrap';
+import styled, {createGlobalStyle} from 'styled-components';
 
 function Curriculum() {
     const levels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
@@ -82,13 +83,13 @@ function Curriculum() {
     const getStatusColor = (status) => {
         switch (status) {
             case 'Aprobada':
-                return 'bg-success text-white'; // Verde pastel
+                return 'bg-pastel-green'; // Verde pastel
             case 'Inscrita':
-                return 'bg-warning text-dark'; // Amarillo pastel
+                return 'bg-pastel-yellow'; // Amarillo pastel
             case 'Desaprobada':
-                return 'bg-danger text-white'; // Rojo pastel
+                return 'bg-pastel-red'; // Rojo pastel
             case 'Por inscribir':
-                return 'bg-primary text-white'; // Azul pastel
+                return 'bg-pastel-blue'; // Azul pastel
             default:
                 return 'bg-light';
         }
@@ -96,11 +97,12 @@ function Curriculum() {
 
     return (
         <>
+            <GlobalStyles />
             <Container>
                 <h1 className="text-center my-4">Malla curricular</h1>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(11, 1fr)', gridTemplateRows: 'repeat(7, 1fr)', textAlign: 'center', gap: '1px' }}>
                     {levels.map(level => (
-                        <div key={`header-${level}`} style={{ gridColumn: level, gridRow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#00a499'}}>
+                        <div key={`header-${level}`} style={{ gridColumn: level, gridRow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#00a499', border: '1px solid black'}}>
                             Nivel {level}
                         </div>
                     ))}
@@ -128,3 +130,31 @@ function Curriculum() {
 }
 
 export default Curriculum;
+
+const GlobalStyles = createGlobalStyle`
+.bg-pastel-green {
+    background-color: #429642; /* Ejemplo de Verde pastel */
+    color: white;
+}
+
+.bg-pastel-yellow {
+    background-color: #f78e43; /* Ejemplo de Amarillo pastel */
+    color: white;
+}
+
+.bg-pastel-red {
+    background-color: #f74343; /* Ejemplo de Rojo pastel */
+    color: white;
+}
+
+.bg-pastel-blue {
+    background-color: #4361f7; /* Ejemplo de Azul pastel */
+    color: white;
+}
+
+.bg-pastel-white {
+    background-color: #ffffff; /* Blanco */
+    color: black;
+}
+
+`
