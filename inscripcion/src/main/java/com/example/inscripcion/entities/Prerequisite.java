@@ -16,4 +16,5 @@ public class Prerequisite {
     private Integer id_generated;
     private Integer id_subject;
     private Integer id_prerequisite;
+    private String status;
 }
