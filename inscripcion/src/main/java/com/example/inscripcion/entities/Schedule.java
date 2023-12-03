@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Schedule {
     @Id
-    private Integer id_schedule;
+    private String id_schedule;
     private String day;
-    private Integer start_schedule;
-    private Integer final_schedule;
+    private String start_schedule;
+    private String final_schedule;
 }

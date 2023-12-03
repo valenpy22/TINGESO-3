@@ -17,7 +17,6 @@ public class Grade {
     private Integer year;
     private Integer semester;
     private String rut;
-    private Integer level;
     private Integer id_subject;
-    private Float grade;
+    private Double grade;
 }
