@@ -53,4 +53,31 @@ public class GradeService {
             return null;
         }
     }
+
+    public Integer getLevelStudentByRut(String rut){
+        List<Grade> grades = gradeRepository.getGradesByRut(rut);
+        Integer max_level = gradeRepository.getMaxLevelByRut(rut);
+        List<Grade> failed_subjects = new ArrayList<>();
+        List<Integer> indexes = new ArrayList<>();
+
+        for(Grade grade : grades){
+            if(!isPassed(grade.getGrade())){
+                failed_subjects.add(grade);
+                indexes.add(grades.indexOf(grade));
+            }
+        }
+
+        for(Grade grade : failed_subjects){
+            //Conseguir el código de la asignatura y ver si se dio
+            //de nuevo.
+            //Ver de qué nivel es la asignatura y si es de primer nivel,
+            //se permite revisar si se aprobó 2 veces más.
+            //Si no, se permite ver si se aprobó 1 vez más
+
+        }
+    }
+
+    public boolean isPassed(Double grade){
+        return grade >= 4;
+    }
 }
