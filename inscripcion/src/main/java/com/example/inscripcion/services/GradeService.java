@@ -2,6 +2,7 @@ package com.example.inscripcion.services;
 
 import com.example.inscripcion.entities.Grade;
 import com.example.inscripcion.entities.Student;
+import com.example.inscripcion.entities.StudyPlan;
 import com.example.inscripcion.repositories.GradeRepository;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -19,6 +20,9 @@ import java.util.List;
 public class GradeService {
     @Autowired
     GradeRepository gradeRepository;
+
+    @Autowired
+    StudyPlanService studyPlanService;
 
     public List<Grade> readCSV(String directory){
         List<Grade> grades = new ArrayList<>();
@@ -54,25 +58,32 @@ public class GradeService {
         }
     }
 
-    public Integer getLevelStudentByRut(String rut){
+    public void setStatusByGrade(String rut){
         List<Grade> grades = gradeRepository.getGradesByRut(rut);
-        Integer max_level = gradeRepository.getMaxLevelByRut(rut);
-        List<Grade> failed_subjects = new ArrayList<>();
-        List<Integer> indexes = new ArrayList<>();
 
         for(Grade grade : grades){
             if(!isPassed(grade.getGrade())){
-                failed_subjects.add(grade);
-                indexes.add(grades.indexOf(grade));
+                grade.setStatus("Reprobada");
+            }else{
+                grade.setStatus("Aprobada");
             }
+            gradeRepository.save(grade);
         }
 
-        for(Grade grade : failed_subjects){
-            //Conseguir el código de la asignatura y ver si se dio
-            //de nuevo.
-            //Ver de qué nivel es la asignatura y si es de primer nivel,
-            //se permite revisar si se aprobó 2 veces más.
-            //Si no, se permite ver si se aprobó 1 vez más
+        for(Grade grade : grades){
+            if(grade.getStatus().equals("Reprobada")){
+                Integer id_subject = grade.getId_subject();
+                Integer level = studyPlanService.getStudyPlanById_subject(id_subject).getLevel();
+
+                List<Grade> grades1 = new ArrayList<>();
+
+                for(Grade grade1 : grades){
+                    if(grade1.getId_subject().equals(id_subject)){
+                        grades1.add(grade1);
+                    }
+                }
+
+            }
 
         }
     }
@@ -80,4 +91,6 @@ public class GradeService {
     public boolean isPassed(Double grade){
         return grade >= 4;
     }
+
+
 }

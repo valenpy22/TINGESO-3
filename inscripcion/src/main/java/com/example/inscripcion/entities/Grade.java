@@ -19,4 +19,5 @@ public class Grade {
     private String rut;
     private Integer id_subject;
     private Double grade;
+    private String status;
 }

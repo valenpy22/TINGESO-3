@@ -55,4 +55,8 @@ public class StudyPlanService {
             return null;
         }
     }
+
+    public StudyPlan getStudyPlanById_subject(Integer id_subject){
+        return studyPlanRepository.getStudyPlanById_subject(id_subject);
+    }
 }
