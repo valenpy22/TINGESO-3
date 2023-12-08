@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Navbar, Nav, Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-function Header() {
+function HeaderTeacher() {
     const navigate = useNavigate();
 
     const handleLoginClick = () => {
@@ -26,11 +26,7 @@ function Header() {
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
                         <Nav.Link href="/home">Inicio</Nav.Link>
-                        {/**<Nav.Link href="/enterschedules">Ingreso horarios</Nav.Link> */}
-                        <Nav.Link href="/subjects">Inscripción asignaturas</Nav.Link>
-                        <Nav.Link href="/curriculum">Malla curricular</Nav.Link>
-                        <Nav.Link href="/schedule">Mi horario</Nav.Link>
-                        <Nav.Link href="/historial">Historial académico</Nav.Link>
+                        <Nav.Link href="/enterschedules">Ingreso horarios</Nav.Link> 
                         <Nav.Link href="/soporte">Ayuda y soporte</Nav.Link>
                     </Nav>
                     <Button variant="outline-light" style={{ borderRadius: '20px' }} onClick={handleLoginClick}>Iniciar sesión</Button>
@@ -40,4 +36,4 @@ function Header() {
     );
 }
 
-export default Header;
+export default HeaderTeacher;

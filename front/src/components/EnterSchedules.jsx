@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Button, Table, Modal, Container, Row, Col } from 'react-bootstrap';
-import Header from './Header.jsx';
+import { Button, Table, Modal, Container, Row, Col, Spinner } from 'react-bootstrap';
+import HeaderTeacher from './HeaderTeacher.jsx';
 
 function EnterSchedules() {
 
     const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-    const hours = ["08:15", "09:50", "11:25", "13:45", "15:20", "16:55", "18:45", "20:20", "21:55"];
+    const hours = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     const [showModal, setShowModal] = useState(false);
     const [selectedSubject, setSelectedSubject] = useState(null);
@@ -42,46 +42,47 @@ function EnterSchedules() {
 
     return(
         <>
-            <Container className="mt-4">
+            <HeaderTeacher />
+            <Container className="mt-4 d-flex flex-column align-items-center justify-content-center">
                 <h1 className="text-center mb-4">Ingreso de horarios</h1>
-                <Row>
-                <Col lg={6} className="mb-4">
-                    <div className="p-4 bg-teal text-white rounded shadow">
-                        <h2>Asignaturas</h2>
-                        {subjects.length > 0 ? (
-                            <Table hover variant="light">
-                            <thead>
-                                <tr>
-                                <th style={{backgroundColor: '#f0ad4e'}}>Nombre</th>
-                                <th style={{backgroundColor: '#f0ad4e'}}>Ingresar horario</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {subjects.map(subject => (
-                                <tr key={subject.id}>
-                                    <td>{subject.name}</td>
-                                    <td><Button variant="primary" onClick={() => handleOpenModal(subject)}>Ingresar horario</Button></td>
-                                </tr>
-                                ))}
-                            </tbody>
-                            </Table>
-                        ) : (
-                            <div>No hay asignaturas</div>
-                        )}
-                    </div>
-                </Col>
+                <Row className="justify-content-center" style={{width: '1500px'}}>
+                    <Col lg={6} className="mb-4">
+                        <div className="p-4 bg-teal text-white rounded shadow">
+                            <h2>Asignaturas</h2>
+                            {subjects.length > 0 ? (
+                                <Table hover variant="light">
+                                <thead>
+                                    <tr>
+                                    <th style={{backgroundColor: '#f0ad4e'}}>Nombre</th>
+                                    <th style={{backgroundColor: '#f0ad4e'}}>Ingresar horario</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {subjects.map(subject => (
+                                    <tr key={subject.id}>
+                                        <td>{subject.name}</td>
+                                        <td><Button variant="primary" onClick={() => handleOpenModal(subject)}>Ingresar horario</Button></td>
+                                    </tr>
+                                    ))}
+                                </tbody>
+                                </Table>
+                            ) : (
+                                <div>No hay asignaturas</div>
+                            )}
+                        </div>
+                    </Col>
                 </Row>
             </Container>
-            <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
+            <Modal show={showModal} onHide={() => setShowModal(false)} size="xl">
                 <Modal.Header closeButton>
                     <Modal.Title>Ingreso de horario</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <h4>{selectedSubject?.name}</h4>
-                    <Table variant="light">
+                    <Table bordered variant="light" style={{textAlign: 'center'}}>
                         <thead>
                             <tr>
-                                <th style={{backgroundColor: '#00a499'}}>Hora/Día</th>
+                                <th style={{backgroundColor: '#00a499', width: '80px'}}>Bloque / Día</th>
                                 {days.map(day => (
                                     <th key={day} style={{backgroundColor: '#00a499'}}>{day}</th>
                                 ))}
@@ -93,10 +94,15 @@ function EnterSchedules() {
                                     <td style={{backgroundColor: '#00a499'}}>{hour}</td>
                                     {days.map(day => (
                                         <td key={day}>
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedSlots?.[day]?.[hour]}
-                                                onChange={() => handleSelectSlot(day, hour)}
+                                            <Button 
+                                                variant="outline-primary" 
+                                                style={{ 
+                                                    backgroundColor: selectedSlots?.[day]?.[hour] ? 'green' : 'transparent',
+                                                    border: 'none',
+                                                    width: '100%',
+                                                    height: '30px'
+                                                }}
+                                                onClick={() => handleSelectSlot(day, hour)}
                                             />
                                         </td>
                                     ))}
@@ -104,6 +110,14 @@ function EnterSchedules() {
                             ))}
                         </tbody>
                     </Table>
+                    <Container className="d-flex justify-content-end">
+                        <Button variant="danger" className="me-2">
+                            Cancelar
+                        </Button>
+                        <Button variant="success">
+                            Guardar
+                        </Button>
+                    </Container>
                 </Modal.Body>
             </Modal>
         </>

@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Schedule {
     @Id
-    private String id_schedule;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id_schedule;
     private String day;
-    private String start_schedule;
-    private String final_schedule;
+    private Integer block;
 }

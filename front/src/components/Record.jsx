@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Table, Modal, Container, Row, Col } from 'react-bootstrap';
+import Header from './Header';
 
 function Record () {
     const subjects = [
@@ -11,6 +12,7 @@ function Record () {
 
     return(
         <>
+            <Header/>
             <Container>
                 <h1>Historial académico</h1>
                 Promedio general: 6.5

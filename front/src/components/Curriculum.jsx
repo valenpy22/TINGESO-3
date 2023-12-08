@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Table, Modal, Container, Row, Col } from 'react-bootstrap';
 import styled, {createGlobalStyle} from 'styled-components';
+import Header from './Header';
 
 function Curriculum() {
     const levels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
@@ -97,6 +98,7 @@ function Curriculum() {
 
     return (
         <>
+            <Header/>
             <GlobalStyles />
             <Container>
                 <h1 className="text-center my-4">Malla curricular</h1>
