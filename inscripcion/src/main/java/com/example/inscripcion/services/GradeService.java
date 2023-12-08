@@ -85,12 +85,20 @@ public class GradeService {
     }
 
     public List<Grade> getGradesByRut(String rut){
+        List<Grade> grades = gradeRepository.getGradesByRut(rut);
+        for(Grade grade : grades){
+            if(grade.getGrade() < 4){
+                grade.setStatus("Reprobada");
+            }else{
+                grade.setStatus("Aprobada");
+            }
+            gradeRepository.save(grade);
+        }
         return gradeRepository.getGradesByRut(rut);
     }
 
     public Integer getMaxLevelByRut(String rut){
         return gradeRepository.getMaxLevelByRut(rut);
     }
-
 
 }

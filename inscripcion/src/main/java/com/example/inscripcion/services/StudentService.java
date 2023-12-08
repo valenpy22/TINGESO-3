@@ -65,5 +65,13 @@ public class StudentService {
         return studentRepository.findStudentsById_career(id_career);
     }
 
-    
+    public boolean studentExists(String rut){
+        return studentRepository.findByRut(rut) != null;
+    }
+
+    public Integer countLevelsByRut(String rut){
+        Integer id_career = findByRut(rut).getId_career();
+        return studyPlanService.countLevelsByIdCareer(id_career);
+    }
+
 }

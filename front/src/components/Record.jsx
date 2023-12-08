@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Button, Table, Modal, Container, Row, Col } from 'react-bootstrap';
+import React from 'react';
+import { Button, Table, Container } from 'react-bootstrap';
 import Header from './Header';
 
 function Record () {

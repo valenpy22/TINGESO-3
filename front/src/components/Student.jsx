@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button, Card, Form, Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
+import axios from 'axios';
 
 function Student() {
     const navigate = useNavigate();
@@ -11,10 +12,16 @@ function Student() {
         setRut(e.target.value);
     };
 
-    const handleLogin = () => {
-        // Aquí deberías validar el RUT
-        // Si es válido, puedes redirigir al usuario a la sección de estudiante
-        // Por ejemplo: navigate('/student-dashboard');
+    const handleLogin = (rut) => {
+        axios.get('http://localhost:8080/students/exists/'+rut)
+        .then(response => {
+            if(response.data){
+                navigate('/curriculum', {state: {rut}});
+            }
+        })
+        .catch(error => {
+            console.log(error);
+        });
     };
 
     const handleBack = () => {
@@ -36,7 +43,7 @@ function Student() {
                                 <Button variant="secondary" onClick={handleBack} className="me-2">
                                     Volver
                                 </Button>
-                                <Button variant="primary" onClick={handleLogin}>
+                                <Button variant="primary" onClick={() => handleLogin(rut)}>
                                     Ingresar
                                 </Button>
                             </Container>

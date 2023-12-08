@@ -1,8 +1,28 @@
-import React, { useState } from 'react';
-import { Button, Table, Modal, Container, Row, Col, Spinner } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Button, Table, Modal, Container, Row, Col } from 'react-bootstrap';
 import HeaderTeacher from './HeaderTeacher.jsx';
+import { useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 function EnterSchedules() {
+
+    const location = useLocation();
+    const { selectedCareer } = location.state || {};
+
+    console.log(selectedCareer);
+
+    const [subjects, setSubjects] = useState([]);
+
+    useEffect(() => {
+        axios.get('http://localhost:8080/careers/'+selectedCareer)
+        .then(response => {
+            setSubjects(response.data);
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    }, [selectedCareer]);
+
 
     const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
     const hours = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -10,22 +30,15 @@ function EnterSchedules() {
     const [showModal, setShowModal] = useState(false);
     const [selectedSubject, setSelectedSubject] = useState(null);
 
-    // Simulando una lista de asignaturas
-    const subjects = [
-        { id: 1, name: 'Matemáticas' },
-        { id: 2, name: 'Física' },
-        // ... otras asignaturas
-    ];
-
     const handleOpenModal = (subject) => {
         setSelectedSubject(subject);
         setShowModal(true);
     };
 
-    const handleSaveSchedule = () => {
+    //const handleSaveSchedule = () => {
         // Aquí iría la lógica para guardar el horario
-        setShowModal(false);
-    };
+        //setShowModal(false);
+    //};
 
 
     const [selectedSlots, setSelectedSlots] = useState({});
@@ -59,8 +72,8 @@ function EnterSchedules() {
                                 </thead>
                                 <tbody>
                                     {subjects.map(subject => (
-                                    <tr key={subject.id}>
-                                        <td>{subject.name}</td>
+                                    <tr key={subject.id_plan}>
+                                        <td>{subject.subject_name}</td>
                                         <td><Button variant="primary" onClick={() => handleOpenModal(subject)}>Ingresar horario</Button></td>
                                     </tr>
                                     ))}
@@ -73,7 +86,7 @@ function EnterSchedules() {
                     </Col>
                 </Row>
             </Container>
-            <Modal show={showModal} onHide={() => setShowModal(false)} size="xl">
+            <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Ingreso de horario</Modal.Title>
                 </Modal.Header>
@@ -111,7 +124,7 @@ function EnterSchedules() {
                         </tbody>
                     </Table>
                     <Container className="d-flex justify-content-end">
-                        <Button variant="danger" className="me-2">
+                        <Button variant="danger" className="me-2" onClick={() => setShowModal(false)}>
                             Cancelar
                         </Button>
                         <Button variant="success">

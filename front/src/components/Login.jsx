@@ -10,7 +10,7 @@ function LoginPage() {
         if (role === 'estudiante') {
             navigate('/estudiante'); // Asegúrate de tener esta ruta configurada en tu enrutador
         } else {
-            navigate('/enterschedules');
+            navigate('/docente');
         }
     };
 
@@ -20,7 +20,7 @@ function LoginPage() {
             <Container className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
                 <Card style={{ width: '18rem', borderRadius: '15px' }}>
                     <Card.Body className="text-center">
-                        <Card.Title>Seleccione su Rol</Card.Title>
+                        <Card.Title>Seleccione su rol</Card.Title>
                         <Button variant="secondary" className="m-2" onClick={() => handleRoleSelection('docente')}>
                             Docente
                         </Button>
