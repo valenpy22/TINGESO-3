@@ -58,7 +58,7 @@ public class StudentService {
     public Integer getMaxNumberOfSubjectsByRut(String rut){
         Student student = findByRut(rut);
         Integer level = gradeService.getLevelByRut(rut);
-        return studyPlanService.countByLevelAndAndId_career(level, student.getId_career());
+        return studyPlanService.countByLevelAndId_career(level, student.getId_career());
     }
 
     public List<Student> getStudentsByCareer(Integer id_career){

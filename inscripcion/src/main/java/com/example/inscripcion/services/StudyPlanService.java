@@ -20,8 +20,8 @@ public class StudyPlanService {
         return studyPlanRepository.getStudyPlanLevelById_Subject(id_subject);
     }
 
-    public Integer countByLevelAndAndId_career(Integer level, Integer id_career){
-        return studyPlanRepository.countByLevelAndAndId_career(level, id_career);
+    public Integer countByLevelAndId_career(Integer level, Integer id_career){
+        return studyPlanRepository.countByLevelAndId_career(level, id_career);
     }
 
     public List<StudyPlan> getStudyPlansById_career(Integer id_career){

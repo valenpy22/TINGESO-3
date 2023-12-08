@@ -32,6 +32,7 @@ public class PrerequisiteService {
                     if(grade.getGrade() < 4){
                         for(Prerequisite prerequisite1 : prerequisites){
                             prerequisite1.setStatus("No se puede inscribir");
+                            prerequisiteRepository.save(prerequisite1);
                         }
                         return false;
                     }
@@ -41,6 +42,7 @@ public class PrerequisiteService {
 
         for(Prerequisite prerequisite : prerequisites){
             prerequisite.setStatus("Por inscribir");
+            prerequisiteRepository.save(prerequisite);
         }
         return true;
     }
@@ -49,6 +51,5 @@ public class PrerequisiteService {
         return prerequisiteRepository.getAllowedSubjectsById_prerequisite(id_prerequisite);
     }
 
-    // ADEMÁS, HAY QUE HACER OTRA TABLA INTERMEDIA QUE PERMITA
-    // CONECTAR STUDYPLAN CON SCHEDULE
+
 }

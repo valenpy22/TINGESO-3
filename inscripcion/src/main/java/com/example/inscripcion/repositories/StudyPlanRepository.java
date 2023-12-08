@@ -17,9 +17,9 @@ public interface StudyPlanRepository extends JpaRepository<StudyPlan, Integer> {
             "WHERE studyplans.id_subject =:id_subject", nativeQuery = true)
     Integer getStudyPlanLevelById_Subject(@Param("id_subject") Integer id_subject);
 
-    @Query(value = "SELECT COUNT(*) FROM studyplans WHERE level =:level" +
+    @Query(value = "SELECT COUNT(*) FROM studyplans WHERE level =:level " +
             "AND studyplans.id_career =:id_career", nativeQuery = true)
-    Integer countByLevelAndAndId_career(@Param("level") Integer level, @Param("id_career") Integer id_career);
+    Integer countByLevelAndId_career(@Param("level") Integer level, @Param("id_career") Integer id_career);
 
     @Query(value = "SELECT * FROM studyplans WHERE studyplans.id_career =:id_career", nativeQuery = true)
     List<StudyPlan> getStudyPlansById_career(@Param("id_career") Integer id_career);

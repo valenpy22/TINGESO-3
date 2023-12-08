@@ -30,4 +30,9 @@ public class StudentController {
     public ResponseEntity<Student> getStudentByRut(@PathVariable("rut") String rut){
         return ResponseEntity.ok(studentService.findByRut(rut));
     }
+
+    @GetMapping("/maxsubjects/{rut}")
+    public ResponseEntity<Integer> getMaxNumberOfSubjectsByRut(@PathVariable("rut") String rut){
+        return ResponseEntity.ok(studentService.getMaxNumberOfSubjectsByRut(rut));
+    }
 }
