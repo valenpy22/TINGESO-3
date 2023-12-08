@@ -40,6 +40,7 @@ function Curriculum() {
                     console.log(response.data);
                 });
             });
+            axios.get('http://localhost:8080/grades/failed/' + rut)
         })
         .catch(error => {
             console.log(error);
@@ -75,10 +76,13 @@ function Curriculum() {
         }
     };
 
-    console.log(levels);
+    localStorage.setItem('student', JSON.stringify(student));
+    localStorage.setItem('subjects', JSON.stringify(subjects));
+    localStorage.setItem('approvedSubjects', JSON.stringify(approvedSubjects));
+    localStorage.setItem('reprovedSubjects', JSON.stringify(reprovedSubjects));
 
     return (
-        <>
+        <div>
             <Header/>
             <GlobalStyles />
             <Container>
@@ -108,7 +112,7 @@ function Curriculum() {
                     ))}
                 </div>
             </Container>
-        </>
+        </div>
     );
 }
 

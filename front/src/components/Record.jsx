@@ -3,22 +3,33 @@ import { Button, Table, Container } from 'react-bootstrap';
 import Header from './Header';
 
 function Record () {
-    const subjects = [
-        {id: 1, name: "Matemáticas", level: 1, status: "Inscrita", schedule: "W1W2"},
-        {id: 2, name: "Física", level: 1, status: "Inscrita", schedule: "L1L2"},
-        {id: 3, name: "Química", level: 2, status: "Inscrita", schedule: "M1M2"},
-        {id: 4, name: "Biología", level: 1, status: "Inscrita", schedule: "J1J2"}
-    ];
+    const student = JSON.parse(localStorage.getItem('student'));
+    const savedApprovedSubjects = JSON.parse(localStorage.getItem('approvedSubjects'));
+    const savedReprovedSubjects = JSON.parse(localStorage.getItem('reprovedSubjects'));
+
+    const subjects = JSON.parse(localStorage.getItem('subjects'));
+
+    const numberApprovedSubjects = savedApprovedSubjects.length;
+    const numberReprovedSubjects = savedReprovedSubjects.length;
+    const numberSubjects = subjects.length;
+
+    console.log(subjects);
 
     return(
         <>
             <Header/>
             <Container>
                 <h1>Historial académico</h1>
-                Promedio general: 6.5
-                Asignaturas aprobadas: 40
-                Asignaturas reprobadas: 5
-
+                <Container>
+                    <h2>Información del estudiante</h2>
+                    <p>Nombre: {student.student_name}</p>
+                    <p>Rut: {student.rut}</p>
+                    <p>Carrera: {student.id_career}</p>
+                    <p>Promedio general: </p>
+                    <p>Asignaturas aprobadas: {numberApprovedSubjects}</p>
+                    <p>Asignaturas reprobadas: {numberReprovedSubjects}</p>
+                    <p>Total de asignaturas: {numberSubjects}</p>
+                </Container>
                 <h2>Lista de asignaturas inscritas</h2>
                 <Table>
                     <thead>
@@ -32,10 +43,9 @@ function Record () {
                     </thead>
                     <tbody>
                         {subjects.map(subject => (
-                            <tr key={subject.id}>
-                                <td>{subject.name}</td>
+                            <tr key={subject.id_subject}>
+                                <td>{subject.subject_name}</td>
                                 <td>{subject.level}</td>
-                                <td>{subject.schedule}</td>
                                 <td>{subject.status}</td>
                                 <td><Button variant="primary">Ver información</Button></td>
                             </tr>

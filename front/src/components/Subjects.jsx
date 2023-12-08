@@ -1,8 +1,26 @@
 import { Button, Table, Container, Row, Col } from "react-bootstrap";
 import React from "react";
 import Header from "./Header.jsx";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 function Subjects(){
+
+    const [maxSubjects, setMaxSubjects] = useState([]);
+
+    const student = JSON.parse(localStorage.getItem('student'));
+    const rut = student.rut;
+
+    useEffect(() => {
+        axios.get('http://localhost:8080/students/maxsubjects/'+rut)
+        .then(response => {
+            console.log(response.data);
+            setMaxSubjects(response.data);
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    }, [rut]);
 
     const subjectsToEnroll = [
         {id: 1, name: "Matemáticas", level: 1, schedule: "W1W2"},

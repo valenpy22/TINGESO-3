@@ -26,7 +26,6 @@ function Header() {
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
                         <Nav.Link href="/home">Inicio</Nav.Link>
-                        {/**<Nav.Link href="/enterschedules">Ingreso horarios</Nav.Link> */}
                         <Nav.Link href="/subjects">Inscripción asignaturas</Nav.Link>
                         <Nav.Link href="/curriculum">Malla curricular</Nav.Link>
                         <Nav.Link href="/schedule">Mi horario</Nav.Link>
