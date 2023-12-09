@@ -1,10 +1,13 @@
 package com.example.inscripcion.services;
 
+import com.example.inscripcion.entities.Grade;
+import com.example.inscripcion.entities.Prerequisite;
 import com.example.inscripcion.entities.StudyPlan;
 import com.example.inscripcion.repositories.StudyPlanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,6 +33,26 @@ public class StudyPlanService {
 
     public Integer countLevelsByIdCareer(Integer id_career){
         return studyPlanRepository.countLevelsByIdCareer(id_career);
+    }
+
+    public List<StudyPlan> getStudyPlanByIdSubjects(List<Prerequisite> prerequisites){
+        List<StudyPlan> studyPlans = new ArrayList<>();
+
+        for(Prerequisite prerequisite : prerequisites){
+            studyPlans.add(studyPlanRepository.getStudyPlanById_subject(prerequisite.getId_subject()));
+        }
+
+        return studyPlans;
+    }
+
+    public List<StudyPlan> getStudyPlanByGrades(List<Grade> grades){
+        List<StudyPlan> studyPlans = new ArrayList<>();
+
+        for(Grade grade : grades){
+            studyPlans.add(studyPlanRepository.getStudyPlanById_subject(grade.getId_subject()));
+        }
+
+        return studyPlans;
     }
 
 }

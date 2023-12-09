@@ -18,6 +18,7 @@ public class Grade {
     private Integer semester;
     private String rut;
     private Integer id_subject;
+    @Column
     private Double grade;
     private String status;
 }

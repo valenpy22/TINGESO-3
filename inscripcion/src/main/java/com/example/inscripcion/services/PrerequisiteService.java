@@ -5,10 +5,7 @@ import com.example.inscripcion.repositories.PrerequisiteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,34 +29,6 @@ public class PrerequisiteService {
         return prerequisiteRepository.findById_subject(id_subject);
     }
 
-    public boolean arePrerequisitesDoneForIdSubject(String rut, Integer id_subject){
-        List<Prerequisite> prerequisites = findById_subject(id_subject);
-
-        for(Prerequisite prerequisite : prerequisites){
-            Integer id_prerequisite = prerequisite.getId_prerequisite();
-
-            List<Grade> grades = gradeService.getGradesByRut(rut);
-
-            for(Grade grade : grades){
-                if(grade.getId_subject().equals(id_prerequisite)){
-                    if(grade.getGrade() < 4){
-                        for(Prerequisite prerequisite1 : prerequisites){
-                            prerequisite1.setStatus("No se puede inscribir");
-                            prerequisiteRepository.save(prerequisite1);
-                        }
-                        return false;
-                    }
-                }
-            }
-        }
-
-        for(Prerequisite prerequisite : prerequisites){
-            prerequisite.setStatus("Por inscribir");
-            prerequisiteRepository.save(prerequisite);
-        }
-        return true;
-    }
-
     public List<Prerequisite> getAllowedSubjects(Integer id_prerequisite){
         return prerequisiteRepository.getAllowedSubjectsById_prerequisite(id_prerequisite);
     }
@@ -74,12 +43,12 @@ public class PrerequisiteService {
                 .toList();
 
         List<Integer> passed_subjects = grades.stream()
-                .filter(grade -> grade.getGrade() >= 4)
+                .filter(grade -> grade.getGrade() != null && grade.getGrade() >= 4)
                 .map(Grade::getId_subject)
                 .toList();
 
         List<Integer> failed_subjects = grades.stream()
-                .filter(grade -> grade.getGrade() < 4)
+                .filter(grade -> grade.getGrade() != null && grade.getGrade() < 4)
                 .map(Grade::getId_subject)
                 .toList();
 
@@ -110,12 +79,17 @@ public class PrerequisiteService {
     }
 
     private List<Prerequisite> convertToPrerequisiteObjects(List<Integer> subjectIds) {
-        List<Prerequisite> prerequisites = new ArrayList<>();
-        for(Integer i : subjectIds){
-            prerequisites.addAll(findById_subject(i));
+        Map<Integer, Prerequisite> uniquePrerequisitesMap = new HashMap<>();
+
+        for(Integer id : subjectIds){
+            List<Prerequisite> prerequisites = findById_subject(id);
+            if(!prerequisites.isEmpty()){
+                Prerequisite firstPrerequisite = prerequisites.get(0);
+                uniquePrerequisitesMap.putIfAbsent(id, firstPrerequisite);
+            }
         }
 
-        return prerequisites;
+        return new ArrayList<>(uniquePrerequisitesMap.values());
     }
 
 }

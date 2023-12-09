@@ -5,9 +5,7 @@ import com.example.inscripcion.services.GradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,5 +28,19 @@ public class GradeController {
     @GetMapping("/failed/{rut}")
     public ResponseEntity<List<Grade>> getFailedGradesByRut(@PathVariable("rut") String rut){
         return ResponseEntity.ok(gradeService.getFailedGradesByRut(rut));
+    }
+
+    @PostMapping("/grade/{year}/{semester}/{rut}/{id_subject}")
+    public ResponseEntity<Grade> saveGrade(
+            @PathVariable("year") Integer year,
+            @PathVariable("semester") Integer semester,
+            @PathVariable("rut") String rut,
+            @PathVariable("id_subject") Integer id_subject){
+        return ResponseEntity.ok(gradeService.saveGrade(year, semester, rut, id_subject));
+    }
+
+    @GetMapping("/enrolled/{rut}")
+    public ResponseEntity<List<Grade>> getEnrolledGrades(@PathVariable("rut") String rut){
+        return ResponseEntity.ok(gradeService.getEnrolledGrades(rut));
     }
 }

@@ -25,16 +25,18 @@ public class GradeService {
         Integer level = 1;
 
         for(Grade grade : grades){
-            if(!isPassed(grade.getGrade())){
-                grade.setStatus("Reprobada");
-            }else{
-                grade.setStatus("Aprobada");
+            if(grade.getGrade() != null){
+                if(!isPassed(grade.getGrade())){
+                    grade.setStatus("Reprobada");
+                }else{
+                    grade.setStatus("Aprobada");
+                }
+                id_subject = grade.getId_subject();
+                if(studyPlanService.getStudyPlanById_subject(id_subject).getLevel() > level){
+                    level = studyPlanService.getStudyPlanById_subject(id_subject).getLevel();
+                }
+                gradeRepository.save(grade);
             }
-            id_subject = grade.getId_subject();
-            if(studyPlanService.getStudyPlanById_subject(id_subject).getLevel() > level){
-                level = studyPlanService.getStudyPlanById_subject(id_subject).getLevel();
-            }
-            gradeRepository.save(grade);
         }
 
         return level;
@@ -51,7 +53,7 @@ public class GradeService {
         List<Grade> passed_grades = new ArrayList<>();
 
         for(Grade grade : grades){
-            if(grade.getStatus().equals("Aprobada")){
+            if(grade.getGrade() >= 4){
                 passed_grades.add(grade);
             }
         }
@@ -64,7 +66,7 @@ public class GradeService {
         List<Grade> failed_grades = new ArrayList<>();
 
         for(Grade grade : grades){
-            if(grade.getStatus().equals("Reprobada")){
+            if(grade.getGrade() < 4){
                 failed_grades.add(grade);
             }
         }
@@ -87,18 +89,44 @@ public class GradeService {
     public List<Grade> getGradesByRut(String rut){
         List<Grade> grades = gradeRepository.getGradesByRut(rut);
         for(Grade grade : grades){
-            if(grade.getGrade() < 4){
-                grade.setStatus("Reprobada");
-            }else{
-                grade.setStatus("Aprobada");
+            if(grade.getGrade() != null){
+                if(grade.getGrade() < 4){
+                    grade.setStatus("Reprobada");
+                }else{
+                    grade.setStatus("Aprobada");
+                }
+                gradeRepository.save(grade);
             }
-            gradeRepository.save(grade);
+
         }
         return gradeRepository.getGradesByRut(rut);
     }
 
     public Integer getMaxLevelByRut(String rut){
         return gradeRepository.getMaxLevelByRut(rut);
+    }
+
+    public Grade saveGrade(Integer year, Integer semester, String rut,
+                           Integer id_subject){
+        Grade gradea = new Grade();
+        gradea.setGrade(0.0);
+        gradea.setStatus("Inscrita");
+        gradea.setRut(rut);
+        gradea.setYear(year);
+        gradea.setSemester(semester);
+        gradea.setId_subject(id_subject);
+
+        gradeRepository.saveGrade(0.0, id_subject,
+                semester, year, rut, "Inscrita");
+        return gradea;
+    }
+
+    public List<Grade> getEnrolledGrades(String rut){
+        List<Grade> enrolledGrades = gradeRepository.getEnrolledGrades(rut);
+        if(enrolledGrades.isEmpty()){
+            return null;
+        }
+        return enrolledGrades;
     }
 
 }

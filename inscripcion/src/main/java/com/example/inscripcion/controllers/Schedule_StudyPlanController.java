@@ -1,5 +1,6 @@
 package com.example.inscripcion.controllers;
 
+import com.example.inscripcion.entities.Prerequisite;
 import com.example.inscripcion.entities.Schedule_StudyPlan;
 import com.example.inscripcion.services.Schedule_StudyPlanService;
 import org.springframework.beans.factory.annotation.Autowired;
