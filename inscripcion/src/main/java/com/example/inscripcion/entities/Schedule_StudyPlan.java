@@ -4,17 +4,16 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.yaml.snakeyaml.events.Event;
-
-import java.util.List;
 
 @Data
-@Table(name = "schedule")
+@Table(name = "schedule_study_plan")
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Schedule {
+public class Schedule_StudyPlan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_schedule;
+    private Integer id_schedule_study_plan;
+    private Integer id_subject;
+    private Integer block;
 }
