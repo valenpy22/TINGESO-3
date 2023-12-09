@@ -7,6 +7,8 @@ import axios from "axios";
 function Subjects(){
 
     const [maxSubjects, setMaxSubjects] = useState([]);
+    const [subjectsToEnroll, setSubjectsToEnroll] = useState([]);
+    const [subjectsEnrolled, setSubjectsEnrolled] = useState([]);
 
     const student = JSON.parse(localStorage.getItem('student'));
     const rut = student.rut;
@@ -20,21 +22,19 @@ function Subjects(){
         .catch(error => {
             console.log(error);
         });
+
+        axios.get('http://localhost:8080/prerequisites/'+rut)
+        .then(response => {
+            console.log(response.data);
+            setSubjectsToEnroll(response.data);
+        })
+        .catch(error => {
+            console.log(error);
+        });
+
     }, [rut]);
 
-    const subjectsToEnroll = [
-        {id: 1, name: "Matemáticas", level: 1, schedule: "W1W2"},
-        {id: 2, name: "Física", level: 1, schedule: "L1L2"},
-        {id: 3, name: "Química", level: 2, schedule: "M1M2"},
-        {id: 4, name: "Biología", level: 1, schedule: "J1J2"}
-    ];
-
-    const subjectsEnrolled = [
-        {id: 5, name: "Lenguaje", level: 1, schedule: "V1V2"},
-        {id: 6, name: "Historia", level: 1, schedule: "S1S2"},
-        {id: 7, name: "Inglés", level: 2, schedule: "W1W2"},
-        {id: 8, name: "Artes", level: 1, schedule: "L1L2"}
-    ];
+    
 
     return(
         <>
@@ -57,9 +57,9 @@ function Subjects(){
                                 </thead>
                                 <tbody>
                                     {subjectsToEnroll.map(subject => (
-                                    <tr key={subject.id}>
+                                    <tr key={subject.id_generated}>
                                         <td><input type="checkbox" /></td>
-                                        <td>{subject.name}</td>
+                                        <td>{subject.id_subject}</td>
                                         <td>{subject.level}</td>
                                         <td>{subject.schedule}</td>
                                     </tr>
