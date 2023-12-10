@@ -18,6 +18,7 @@ function EnterSchedules() {
     const [filterLevel, setFilterLevel] = useState("");
 
     const [sortOption, setSortOption] = useState("level");
+    const [schedules, setSchedules] = useState({});
 
 
     useEffect(() => {
@@ -29,6 +30,26 @@ function EnterSchedules() {
             console.log(error);
         });
     }, [selectedCareer]);
+
+    useEffect(() => {
+        const loadSchedules = async () => {
+            let newSchedules = {};
+
+            for (let subject of subjects) {
+                try {
+                    const response = await axios.get(`http://localhost:8080/schedules_studyplan/${subject.id_subject}`);
+                    newSchedules[subject.id_subject] = response.data;
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+
+            setSchedules(newSchedules);
+        };
+
+        loadSchedules();
+    }, [subjects]);
+
 
 
     const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
@@ -69,7 +90,7 @@ function EnterSchedules() {
     function submitSchedule() {
         const scheduleStudyPlans = convertToScheduleFormat();
 
-        axios.delete('http://localhost:8080/schedules_studyplan/' + selectedSubject.id_subject)
+        axios.delete('http://localhost:8080/schedules_studyplan/delete/' + selectedSubject.id_subject)
             .then(response => {
                 console.log('Success:', response.data);
             })
@@ -81,6 +102,11 @@ function EnterSchedules() {
             .then(response => {
                 console.log('Success:', response.data);
                 setShowModal(false);
+
+                setSchedules(prevSchedules => ({
+                    ...prevSchedules,
+                    [selectedSubject.id_subject]: scheduleStudyPlans
+                }));
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -138,6 +164,16 @@ function EnterSchedules() {
         return null;
     };
 
+    const getDayNameFromBlockNumber2 = (blockNumber) => {
+        if(blockNumber >= 1 && blockNumber <= 9) return "L";
+        if(blockNumber >= 10 && blockNumber <= 18) return "M";
+        if(blockNumber >= 19 && blockNumber <= 27) return "W";
+        if(blockNumber >= 28 && blockNumber <= 36) return "J";
+        if(blockNumber >= 37 && blockNumber <= 45) return "V";
+        if(blockNumber >= 46 && blockNumber <= 54) return "S";
+        return null;
+    };
+
     const getBlockNumberFromUniqueNumber = (uniqueBlockNumber) => {
         return uniqueBlockNumber % 9 === 0 ? 9 : uniqueBlockNumber % 9;
     };
@@ -172,6 +208,19 @@ function EnterSchedules() {
         return subject.subject_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
             (filterLevel ? subject.level === parseInt(filterLevel) : true);
     }));
+
+    const getBlockNameFromDayAndNumber = (block) => {
+        const dayName = getDayNameFromBlockNumber2(block);
+        const blockNumber = getBlockNumberFromUniqueNumber(block);
+        return dayName + blockNumber;
+    };
+
+    const getScheduleNameFromSubject = (subject) => {
+        const subjectSchedules = schedules[subject.id_subject];
+        if (!subjectSchedules) return null;
+        const scheduleNames = subjectSchedules.map(schedule => getBlockNameFromDayAndNumber(schedule.block));
+        return scheduleNames.join("");
+    };
 
     return(
         <>
@@ -219,6 +268,7 @@ function EnterSchedules() {
                                     <tr>
                                     <th style={{backgroundColor: '#f0ad4e'}}>Nombre asignatura</th>
                                     <th style={{backgroundColor: '#f0ad4e'}}>Nivel</th>
+                                    <th style={{backgroundColor: '#f0ad4e'}}>Horario actual</th>
                                     <th style={{backgroundColor: '#f0ad4e'}}>Ingresar horario</th>
                                     </tr>
                                 </thead>
@@ -227,6 +277,7 @@ function EnterSchedules() {
                                     <tr key={subject.id_plan}>
                                         <td>{subject.subject_name}</td>
                                         <td>{subject.level}</td>
+                                        <td>{getScheduleNameFromSubject(subject)}</td>
                                         <td><Button variant="primary" onClick={() => handleOpenModal(subject)}>Ingresar horario</Button></td>
                                     </tr>
                                     ))}

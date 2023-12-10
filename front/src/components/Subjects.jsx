@@ -13,8 +13,9 @@ function Subjects(){
     const [prerequisites, setPrerequisites] = useState([]);
     const [subjectsToEnroll, setSubjectsToEnroll] = useState([]);
     const [subjectsEnrolled, setSubjectsEnrolled] = useState([]);
+    const [schedules, setSchedules] = useState([]);
 
-    useEffect(() => {
+    useEffect(() => {        
         //Se obtiene la información de los prerrequisitos
         axios.get(`http://localhost:8080/prerequisites/${rut}`)
             .then(response => {
@@ -69,6 +70,14 @@ function Subjects(){
             .then(response => {
                 console.log("Subjects enrolled: ", response.data);
                 setSubjectsEnrolled(response.data);
+                axios.get('http://localhost:8080/schedules_studyplan/schedule/'+rut)
+                    .then(response => {
+                        console.log("Schedules: ", response.data);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+
             })
             .catch(error => {
                 console.log(error);
@@ -76,34 +85,88 @@ function Subjects(){
         }
     }, [grades]);
 
+    useEffect(() => {
+        const loadSchedules = async () => {
+            let newSchedules = {};
+
+            for (let subject of [...subjectsToEnroll, ...subjectsEnrolled]) {
+                try {
+                    const response = await axios.get(`http://localhost:8080/schedules_studyplan/${subject.id_subject}`);
+                    newSchedules[subject.id_subject] = response.data;
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+
+            setSchedules(newSchedules);
+        };
+
+        loadSchedules();
+    }, [subjectsToEnroll, subjectsEnrolled]);
+
     const handleSubmit = (id_subject) => {
         if(subjectsEnrolled.length < 1){
             alert("Debes inscribir al menos 3 asignaturas");
         };
-        //Se inscribe una asignatura según un rut y un id_subject
-        if(subjectsEnrolled.length < maxSubjects){
 
-            axios.post(`http://localhost:8080/grades/grade/${rut}/${id_subject}`)
-                .then(response => {
-                    console.log('Success:', response.data);
+        //Se obtienen los horarios de las asignaturas inscritas
+        axios.get('http://localhost:8080/schedules_studyplan/schedule/'+rut)
+            .then(response => {
+                console.log("Schedules: ", response.data);
+                const enrolledSchedules = response.data;
 
-                    const enrolledSubject = subjectsToEnroll.find(subject => subject.id_subject === id_subject);
+                //Se obtiene los horarios de la asignatura por inscribir
+                axios.get(`http://localhost:8080/schedules_studyplan/${id_subject}`)
+                    .then(response => {
+                        console.log("Schedule: ", response.data);
+                        const schedule = response.data;
+                        if(compareSchedules(enrolledSchedules, schedule)){
+                            alert("No puedes inscribir esta asignatura, ya que se cruza con otra asignatura inscrita");
+                        }else{
+                            //Se inscribe una asignatura según un rut y un id_subject
+                            if(subjectsEnrolled.length < maxSubjects){
 
-                    const updatedSubjectsToEnroll = subjectsToEnroll.filter(subject => subject.id_subject !== id_subject);
-                    setSubjectsToEnroll(updatedSubjectsToEnroll);
+                                axios.post(`http://localhost:8080/grades/grade/${rut}/${id_subject}`)
+                                    .then(response => {
+                                        console.log('Success:', response.data);
 
-                    if(enrolledSubject){
-                        setSubjectsEnrolled([...subjectsEnrolled, enrolledSubject]);
-                    };
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        }else{
-            alert("No puedes inscribir más asignaturas");
-        }
+                                        const enrolledSubject = subjectsToEnroll.find(subject => subject.id_subject === id_subject);
 
+                                        const updatedSubjectsToEnroll = subjectsToEnroll.filter(subject => subject.id_subject !== id_subject);
+                                        setSubjectsToEnroll(updatedSubjectsToEnroll);
+
+                                        if(enrolledSubject){
+                                            setSubjectsEnrolled([...subjectsEnrolled, enrolledSubject]);
+                                        };
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                    });
+                            }else{
+                                alert("No puedes inscribir más asignaturas");
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });    
+            })
+            .catch(error => {
+                console.log(error);
+            });
     };
+
+    const compareSchedules = (enrolledSchedules, newSubjectSchedules) => {
+        for (let enrolledSchedule of enrolledSchedules) {
+            for (let newSchedule of newSubjectSchedules) {
+                if(enrolledSchedule.block === newSchedule.block){
+                    return true; // Hay conflicto
+                }
+            }
+        }
+        return false; // No hay conflicto
+    };
+
 
     const handleUnEnroll = (id_subject) => {
         //Se desinscribe una asignatura según un rut y un id_subject
@@ -124,7 +187,34 @@ function Subjects(){
             .catch(error => {
                 console.error('Error:', error);
             });
-    }
+    };
+
+    const getDayNameFromBlockNumber = (blockNumber) => {
+        if(blockNumber >= 1 && blockNumber <= 9) return "L";
+        if(blockNumber >= 10 && blockNumber <= 18) return "M";
+        if(blockNumber >= 19 && blockNumber <= 27) return "W";
+        if(blockNumber >= 28 && blockNumber <= 36) return "J";
+        if(blockNumber >= 37 && blockNumber <= 45) return "V";
+        if(blockNumber >= 46 && blockNumber <= 54) return "S";
+        return null;
+    };
+
+    const getBlockNumberFromUniqueNumber = (uniqueBlockNumber) => {
+        return uniqueBlockNumber % 9 === 0 ? 9 : uniqueBlockNumber % 9;
+    };
+
+    const getBlockNameFromDayAndNumber = (block) => {
+        const dayName = getDayNameFromBlockNumber(block);
+        const blockNumber = getBlockNumberFromUniqueNumber(block);
+        return dayName + blockNumber;
+    };
+
+    const getScheduleNameFromSubject = (subject) => {
+        const subjectSchedules = schedules[subject.id_subject];
+        if (!subjectSchedules) return null;
+        const scheduleNames = subjectSchedules.map(schedule => getBlockNameFromDayAndNumber(schedule.block));
+        return scheduleNames.join("");
+    };
 
     return(
         <>
@@ -151,7 +241,7 @@ function Subjects(){
                                         <td><Button variant="success" onClick={()=>handleSubmit(subject.id_subject)}>Agregar</Button></td>
                                         <td>{subject.subject_name}</td>
                                         <td>{subject.level}</td>
-                                        <td>{subject.schedule}</td>
+                                        <td>{getScheduleNameFromSubject(subject)}</td>
                                     </tr>
                                     ))}
                                 </tbody>
@@ -180,7 +270,7 @@ function Subjects(){
                                         <td><Button variant="danger" onClick={() => handleUnEnroll(subject.id_subject)}>Desinscribir</Button></td>
                                         <td>{subject.subject_name}</td>
                                         <td>{subject.level}</td>
-                                        <td>{subject.schedule}</td>
+                                        <td>{getScheduleNameFromSubject(subject)}</td>
                                     </tr>
                                     ))}
                                 </tbody>

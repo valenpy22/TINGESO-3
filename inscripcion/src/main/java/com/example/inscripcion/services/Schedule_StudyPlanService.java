@@ -58,4 +58,14 @@ public class Schedule_StudyPlanService {
 
         return scheduleStudyPlans;
     }
+
+    public boolean deleteSchedulesWithNullBlocks(){
+        scheduleStudyPlanRepository.deleteAll(
+                scheduleStudyPlanRepository
+                        .findAll().stream()
+                        .filter(sc -> sc.getBlock() == null).toList());
+
+        return scheduleStudyPlanRepository.findAll().stream()
+                .filter(sc -> sc.getBlock() == null).toList().isEmpty();
+    }
 }

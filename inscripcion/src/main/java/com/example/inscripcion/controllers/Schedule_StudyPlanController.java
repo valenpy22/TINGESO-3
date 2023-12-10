@@ -26,13 +26,18 @@ public class Schedule_StudyPlanController {
         return ResponseEntity.ok(scheduleStudyPlanService.getSchedulesByIdSubject(id_subject));
     }
 
-    @DeleteMapping("/{id_subject}")
+    @DeleteMapping("/delete/{id_subject}")
     public ResponseEntity<List<Schedule_StudyPlan>> deleteSchedulesByIdSubject(
             @PathVariable("id_subject") Integer id_subject){
         return ResponseEntity.ok(scheduleStudyPlanService.deleteAllSchedulesByIdSubject(id_subject));
     }
 
-    @GetMapping("/{rut}")
+    @DeleteMapping("/null")
+    public ResponseEntity<Boolean> deleteSchedulesWithNullBlocks(){
+        return ResponseEntity.ok(scheduleStudyPlanService.deleteSchedulesWithNullBlocks());
+    }
+
+    @GetMapping("/schedule/{rut}")
     public ResponseEntity<List<Schedule_StudyPlan>> getSchedulesByRut(
             @PathVariable("rut") String rut){
         return ResponseEntity.ok(scheduleStudyPlanService.getSchedulesByRut(rut));
