@@ -8,7 +8,7 @@ import { useLocation } from 'react-router-dom';
 
 function Curriculum() {
     const location = useLocation();
-    const { rut } = location.state || {};
+    const rut = localStorage.getItem('rut');
 
     const [subjects, setSubjects] = useState([]);
     const [maxLevels, setMaxLevels] = useState([]);
@@ -155,28 +155,27 @@ export default Curriculum;
 
 const GlobalStyles = createGlobalStyle`
 .bg-pastel-green {
-    background-color: #429642; /* Ejemplo de Verde pastel */
+    background-color: #8dd6b1; /* Verde pastel suave */
     color: white;
 }
 
 .bg-pastel-yellow {
-    background-color: #f78e43; /* Ejemplo de Amarillo pastel */
+    background-color: #f0e68c; /* Amarillo pastel suave */
     color: white;
 }
 
 .bg-pastel-red {
-    background-color: #f74343; /* Ejemplo de Rojo pastel */
+    background-color: #ffb6c1; /* Rojo pastel suave */
     color: white;
 }
 
 .bg-pastel-blue {
-    background-color: #4361f7; /* Ejemplo de Azul pastel */
+    background-color: #add8e6; /* Azul pastel suave */
     color: white;
 }
 
 .bg-pastel-white {
-    background-color: #ffffff; /* Blanco */
+    background-color: #f5f5f5; /* Blanco pastel suave */
     color: black;
 }
-
-`
+`;

@@ -10,6 +10,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Home from './components/Home';
 import Student from './components/Student';
 import Teacher from './components/Teacher';
+import MySchedule from './components/MySchedule';
 
 
 function App() {
@@ -25,6 +26,8 @@ function App() {
           <Route path="/historial" element={<Record />}/>
           <Route path="/estudiante" element={<Student />}/>
           <Route path="/docente" element={<Teacher />}/>
+          <Route path="/" element={<Login />} />
+          <Route path="/schedule" element={<MySchedule />} />
 
         </Routes>
       </Router>

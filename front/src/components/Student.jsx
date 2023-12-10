@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Card, Form, Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
@@ -8,6 +8,30 @@ function Student() {
     const navigate = useNavigate();
     const [rut, setRut] = useState('');
 
+    useEffect(() => {
+        axios.put('http://localhost:8080/students/status/'+rut)
+        .then(response => {
+            console.log(response);
+
+            axios.get('http://localhost:8080/students/get_status/'+rut)
+                .then(response => {
+                    console.log(response);
+                    const student = response.data;
+                    if(student.status === 'Regular'){
+                        navigate('/curriculum');
+                    }else if(student.status === 'Eliminado'){
+                        alert('Estimado estudiante, usted se encuentra eliminado de la carrera, por lo que no puede acceder a su curriculum');
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    }, [rut]);
+
     const handleRutChange = (e) => {
         setRut(e.target.value);
     };
@@ -16,7 +40,8 @@ function Student() {
         axios.get('http://localhost:8080/students/exists/'+rut)
         .then(response => {
             if(response.data){
-                navigate('/curriculum', {state: {rut}});
+                localStorage.setItem('rut', rut);
+                navigate('/curriculum');
             }
         })
         .catch(error => {

@@ -1,0 +1,25 @@
+.schedule-grid {
+    display: grid;
+    grid-template-columns: auto repeat(6, 1fr); /* 1 columna para las horas y 6 para los días */
+    gap: 5px; /* Espacio entre celdas */
+}
+
+.hour, .schedule-cell {
+    display: flex;
+    align-items: center; /* Centra verticalmente */
+    justify-content: center; /* Centra horizontalmente */
+    min-height: 50px; /* Altura mínima para cada celda */
+    border: 1px solid #ddd; /* Borde para las celdas */
+    padding: 5px;
+}
+
+.subject-color {
+    padding: 5px;
+    border-radius: 5px; /* Bordes redondeados para las asignaturas */
+    text-align: center; /* Asegura que el texto esté centrado */
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
