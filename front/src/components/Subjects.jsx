@@ -5,90 +5,107 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 function Subjects(){
-
-    const [maxSubjects, setMaxSubjects] = useState([]);
-    const [prerequisites, setPrerequisites] = useState([]);
-    const [subjectsToEnroll, setSubjectsToEnroll] = useState([]);
-    const [subjectsEnrolled, setSubjectsEnrolled] = useState([]);
-    const [grades, setGrades] = useState([]);
-
     const student = JSON.parse(localStorage.getItem('student'));
     const rut = student.rut;
 
-    useEffect(() => {
-        axios.get('http://localhost:8080/students/maxsubjects/'+rut)
-        .then(response => {
-            console.log("Max subjects: ", response.data);
-            setMaxSubjects(response.data);
-        })
-        .catch(error => {
-            console.log(error);
-        });
-
-        axios.get('http://localhost:8080/prerequisites/'+rut)
-        .then(response => {
-            console.log("Prerequisites: ", response.data);
-            setPrerequisites(response.data);
-        })
-        .catch(error => {
-            console.log(error);
-        });
-
-    }, [rut]);
+    const [grades, setGrades] = useState([]);
+    const [prerequisites, setPrerequisites] = useState([]);
+    const [subjectsToEnroll, setSubjectsToEnroll] = useState([]);
+    const [subjectsEnrolled, setSubjectsEnrolled] = useState([]);
 
     useEffect(() => {
-        if(prerequisites.length > 0){
-            axios.post('http://localhost:8080/study_plans/prerequisites', prerequisites)
+        //Se obtiene la información de los prerrequisitos
+        axios.get(`http://localhost:8080/prerequisites/${rut}`)
             .then(response => {
-                const sortedSubjects = response.data.sort((a, b) => a.level - b.level)
-                console.log("Subjects to enroll: ", response.data);
-                setSubjectsToEnroll(sortedSubjects);
+                console.log("Prerequisites: ", response.data);
+                setPrerequisites(response.data);
             })
             .catch(error => {
                 console.log(error);
             });
-        }
-        
-    }, [prerequisites]);
-
+    }, [rut]);
+    
     useEffect(() => {
-        axios.post('http://localhost:8080/study_plans/grades', grades)
-        .then(response => {
-            console.log("Subjects enrolled: ", response.data);
-            setSubjectsEnrolled(response.data);
-        })
-        .catch(error => {
-            console.log(error);
-        });
-    }, [grades]);
-
-    const handleSubmit = (id_subject) => {
-        
-        const year = new Date().getFullYear() + 1;
-
-        axios.post(`http://localhost:8080/grades/grade/${year}/1/${rut}/${id_subject}`)
-        .then(response => {
-            console.log("Grade:", response.data);
-
-            axios.get('http://localhost:8080/grades/'+rut)
+        axios.get('http://localhost:8080/grades/enrolled/'+rut)
             .then(response => {
-                console.log("Total grades: ", response.data);
-            });
-            
-            axios.get('http://localhost:8080/grades/enrolled/'+rut)
-            .then(response => {
-                console.log("Enrolled grades: ", response.data);
+                console.log("Grades: ", response.data);
                 setGrades(response.data);
             })
             .catch(error => {
                 console.log(error);
             });
-        })
-        .catch(error => {
-            console.log(error);
-        });
+        
+    }, [rut]);
+
+    useEffect(() => {
+        if (prerequisites.length > 0) {
+            //Se obtiene la información de las asignaturas por inscribir
+            axios.post('http://localhost:8080/study_plans/prerequisites', prerequisites)
+                .then(response => {
+                    const sortedSubjects = response.data.sort((a, b) => a.level - b.level);
+                    console.log("Subjects to enroll: ", sortedSubjects);
+                    setSubjectsToEnroll(sortedSubjects);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        }
+    }, [prerequisites]);
+
+    useEffect(() => {
+        if(grades.length > 0){
+            //Se obtiene la información de las asignaturas inscritas
+            axios.post('http://localhost:8080/study_plans/grades', grades)
+            .then(response => {
+                console.log("Subjects enrolled: ", response.data);
+                setSubjectsEnrolled(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+        }
+    }, [grades]);
+
+    const handleSubmit = (id_subject) => {
+        //Se inscribe una asignatura según un rut y un id_subject
+        axios.post(`http://localhost:8080/grades/grade/${rut}/${id_subject}`)
+            .then(response => {
+                console.log('Success:', response.data);
+
+                const enrolledSubject = subjectsToEnroll.find(subject => subject.id_subject === id_subject);
+
+                const updatedSubjectsToEnroll = subjectsToEnroll.filter(subject => subject.id_subject !== id_subject);
+                setSubjectsToEnroll(updatedSubjectsToEnroll);
+
+                if(enrolledSubject){
+                    setSubjectsEnrolled([...subjectsEnrolled, enrolledSubject]);
+                };
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     };
-    
+
+    const handleUnEnroll = (id_subject) => {
+        //Se desinscribe una asignatura según un rut y un id_subject
+        axios.delete(`http://localhost:8080/grades/delete/grade/${rut}/${id_subject}`)
+            .then(response => {
+                console.log('Success:', response.data);
+                setGrades(response.data);
+
+                const unenrolledSubject = subjectsEnrolled.find(subject => subject.id_subject === id_subject);
+
+                const updatedEnrolledSubjects = subjectsEnrolled.filter(subject => subject.id_subject !== id_subject);
+                setSubjectsEnrolled(updatedEnrolledSubjects);
+
+                if(unenrolledSubject){
+                    setSubjectsToEnroll([...subjectsToEnroll, unenrolledSubject]);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
 
     return(
         <>
@@ -141,7 +158,7 @@ function Subjects(){
                                 <tbody>
                                     {subjectsEnrolled.map(subject => (
                                     <tr key={subject.id_plan}>
-                                        <td><Button variant="danger">Desinscribir</Button></td>
+                                        <td><Button variant="danger" onClick={() => handleUnEnroll(subject.id_subject)}>Desinscribir</Button></td>
                                         <td>{subject.subject_name}</td>
                                         <td>{subject.level}</td>
                                         <td>{subject.schedule}</td>

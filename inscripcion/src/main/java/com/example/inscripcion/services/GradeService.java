@@ -2,6 +2,7 @@ package com.example.inscripcion.services;
 
 import com.example.inscripcion.entities.Grade;
 import com.example.inscripcion.repositories.GradeRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -25,18 +26,12 @@ public class GradeService {
         Integer level = 1;
 
         for(Grade grade : grades){
-            if(grade.getGrade() != null){
-                if(!isPassed(grade.getGrade())){
-                    grade.setStatus("Reprobada");
-                }else{
-                    grade.setStatus("Aprobada");
-                }
-                id_subject = grade.getId_subject();
-                if(studyPlanService.getStudyPlanById_subject(id_subject).getLevel() > level){
-                    level = studyPlanService.getStudyPlanById_subject(id_subject).getLevel();
-                }
-                gradeRepository.save(grade);
+            id_subject = grade.getId_subject();
+            if(studyPlanService.getStudyPlanById_subject(id_subject).getLevel() > level){
+                level = studyPlanService.getStudyPlanById_subject(id_subject).getLevel();
             }
+            gradeRepository.save(grade);
+
         }
 
         return level;
@@ -66,7 +61,7 @@ public class GradeService {
         List<Grade> failed_grades = new ArrayList<>();
 
         for(Grade grade : grades){
-            if(grade.getGrade() < 4){
+            if(grade.getGrade() < 4 && grade.getGrade() != 0.0){
                 failed_grades.add(grade);
             }
         }
@@ -87,18 +82,6 @@ public class GradeService {
     }
 
     public List<Grade> getGradesByRut(String rut){
-        List<Grade> grades = gradeRepository.getGradesByRut(rut);
-        for(Grade grade : grades){
-            if(grade.getGrade() != null){
-                if(grade.getGrade() < 4){
-                    grade.setStatus("Reprobada");
-                }else{
-                    grade.setStatus("Aprobada");
-                }
-                gradeRepository.save(grade);
-            }
-
-        }
         return gradeRepository.getGradesByRut(rut);
     }
 
@@ -106,27 +89,39 @@ public class GradeService {
         return gradeRepository.getMaxLevelByRut(rut);
     }
 
-    public Grade saveGrade(Integer year, Integer semester, String rut,
-                           Integer id_subject){
+    public Grade saveGrade(String rut, Integer id_subject){
         Grade gradea = new Grade();
         gradea.setGrade(0.0);
         gradea.setStatus("Inscrita");
         gradea.setRut(rut);
-        gradea.setYear(year);
-        gradea.setSemester(semester);
+        gradea.setYear(2024);
+        gradea.setSemester(1);
         gradea.setId_subject(id_subject);
 
-        gradeRepository.saveGrade(0.0, id_subject,
-                semester, year, rut, "Inscrita");
-        return gradea;
+        return gradeRepository.save(gradea);
     }
 
     public List<Grade> getEnrolledGrades(String rut){
-        List<Grade> enrolledGrades = gradeRepository.getEnrolledGrades(rut);
-        if(enrolledGrades.isEmpty()){
-            return null;
+        List<Grade> grades = gradeRepository.getGradesByRut(rut);
+        return grades.stream().filter(g -> g.getStatus() != null && g.getStatus().equals("Inscrita")).toList();
+    }
+
+    public List<Grade> deleteGradeByRut(String rut, Integer id_subject){
+        List<Grade> grades = gradeRepository.getGradesByRut(rut);
+        Grade grade = grades.stream()
+                .filter(g -> g.getId_subject().equals(id_subject))
+                .findFirst()
+                .orElse(null);
+
+        if(grade != null){
+            gradeRepository.deleteById(grade.getId_grade());
+        }else{
+            throw new EntityNotFoundException("Grade not found");
         }
-        return enrolledGrades;
+
+        return gradeRepository.getGradesByRut(rut).stream()
+                .filter(g -> "Inscrita".equals(g.getStatus()))
+                .toList();
     }
 
 }

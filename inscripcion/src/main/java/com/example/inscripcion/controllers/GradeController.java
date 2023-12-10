@@ -30,17 +30,21 @@ public class GradeController {
         return ResponseEntity.ok(gradeService.getFailedGradesByRut(rut));
     }
 
-    @PostMapping("/grade/{year}/{semester}/{rut}/{id_subject}")
-    public ResponseEntity<Grade> saveGrade(
-            @PathVariable("year") Integer year,
-            @PathVariable("semester") Integer semester,
+    @PostMapping("/grade/{rut}/{id_subject}")
+    public ResponseEntity<Grade> enrollSubject(
             @PathVariable("rut") String rut,
             @PathVariable("id_subject") Integer id_subject){
-        return ResponseEntity.ok(gradeService.saveGrade(year, semester, rut, id_subject));
+        return ResponseEntity.ok(gradeService.saveGrade(rut, id_subject));
     }
 
     @GetMapping("/enrolled/{rut}")
     public ResponseEntity<List<Grade>> getEnrolledGrades(@PathVariable("rut") String rut){
         return ResponseEntity.ok(gradeService.getEnrolledGrades(rut));
+    }
+
+    @DeleteMapping("/delete/grade/{rut}/{id_subject}")
+    public ResponseEntity<List<Grade>> deleteGradeByRut(
+            @PathVariable("rut") String rut, @PathVariable("id_subject") Integer id_subject){
+        return ResponseEntity.ok(gradeService.deleteGradeByRut(rut, id_subject));
     }
 }
