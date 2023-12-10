@@ -8,6 +8,7 @@ function Subjects(){
     const student = JSON.parse(localStorage.getItem('student'));
     const rut = student.rut;
 
+    const [maxSubjects, setMaxSubjects] = useState(0); //Se obtiene el máximo de asignaturas que puede inscribir un estudiante
     const [grades, setGrades] = useState([]);
     const [prerequisites, setPrerequisites] = useState([]);
     const [subjectsToEnroll, setSubjectsToEnroll] = useState([]);
@@ -19,6 +20,15 @@ function Subjects(){
             .then(response => {
                 console.log("Prerequisites: ", response.data);
                 setPrerequisites(response.data);
+
+                axios.get(`http://localhost:8080/students/maxsubjects/${rut}`)
+                    .then(response => {
+                        console.log("Max subjects: ", response.data);
+                        setMaxSubjects(response.data);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
             })
             .catch(error => {
                 console.log(error);
@@ -67,23 +77,32 @@ function Subjects(){
     }, [grades]);
 
     const handleSubmit = (id_subject) => {
+        if(subjectsEnrolled.length < 1){
+            alert("Debes inscribir al menos 3 asignaturas");
+        };
         //Se inscribe una asignatura según un rut y un id_subject
-        axios.post(`http://localhost:8080/grades/grade/${rut}/${id_subject}`)
-            .then(response => {
-                console.log('Success:', response.data);
+        if(subjectsEnrolled.length < maxSubjects){
 
-                const enrolledSubject = subjectsToEnroll.find(subject => subject.id_subject === id_subject);
+            axios.post(`http://localhost:8080/grades/grade/${rut}/${id_subject}`)
+                .then(response => {
+                    console.log('Success:', response.data);
 
-                const updatedSubjectsToEnroll = subjectsToEnroll.filter(subject => subject.id_subject !== id_subject);
-                setSubjectsToEnroll(updatedSubjectsToEnroll);
+                    const enrolledSubject = subjectsToEnroll.find(subject => subject.id_subject === id_subject);
 
-                if(enrolledSubject){
-                    setSubjectsEnrolled([...subjectsEnrolled, enrolledSubject]);
-                };
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+                    const updatedSubjectsToEnroll = subjectsToEnroll.filter(subject => subject.id_subject !== id_subject);
+                    setSubjectsToEnroll(updatedSubjectsToEnroll);
+
+                    if(enrolledSubject){
+                        setSubjectsEnrolled([...subjectsEnrolled, enrolledSubject]);
+                    };
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }else{
+            alert("No puedes inscribir más asignaturas");
+        }
+
     };
 
     const handleUnEnroll = (id_subject) => {

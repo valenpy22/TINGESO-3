@@ -13,7 +13,12 @@ function EnterSchedules() {
     const [showModal, setShowModal] = useState(false);
     const [selectedSubject, setSelectedSubject] = useState(null);
     const [selectedSlots, setSelectedSlots] = useState({});
-    const [originalSchedules, setOriginalSchedules] = useState([]);
+
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filterLevel, setFilterLevel] = useState("");
+
+    const [sortOption, setSortOption] = useState("level");
+
 
     useEffect(() => {
         axios.get('http://localhost:8080/careers/'+selectedCareer)
@@ -92,17 +97,33 @@ function EnterSchedules() {
         }));
     };
 
+    const initializeEmptySlots = () => {
+        let slots = {};
+        days.forEach(day => {
+            slots[day] = {};
+            blocks.forEach(block => {
+                slots[day][block] = false;
+            });
+        });
+        return slots;
+    };
+
     const handleOpenModal = (subject) => {
         setSelectedSubject(subject);
         axios.get('http://localhost:8080/schedules_studyplan/' + subject.id_subject)
             .then(response => {
                 // Aquí debes transformar la respuesta a tu formato de `selectedSlots`
                 const fetchedSchedules = response.data;
-                const updatedSlots = transformFetchedSchedulesToSlots(fetchedSchedules);
+                const updatedSlots = fetchedSchedules.length > 0
+                    ? transformFetchedSchedulesToSlots(fetchedSchedules)
+                    : initializeEmptySlots();
+
+                
                 setSelectedSlots(updatedSlots);
             })
             .catch(error => {
                 console.error('Error:', error);
+                setSelectedSlots(initializeEmptySlots());
             });
         setShowModal(true);
     };
@@ -136,28 +157,76 @@ function EnterSchedules() {
         return slots;
     };
     
+    const sortSubjects = (subjects) => {
+        switch(sortOption) {
+            case "name":
+                return subjects.sort((a, b) => a.subject_name.localeCompare(b.subject_name));
+            case "level":
+                return subjects.sort((a, b) => a.level - b.level);
+            default:
+                return subjects;
+        }
+    };
+
+    const filteredSubjects = sortSubjects(subjects.filter(subject => {
+        return subject.subject_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+            (filterLevel ? subject.level === parseInt(filterLevel) : true);
+    }));
 
     return(
         <>
             <HeaderTeacher />
             <Container className="mt-4 d-flex flex-column align-items-center justify-content-center">
                 <h1 className="text-center mb-4">Ingreso de horarios</h1>
+                <Row>
+                    <Col>
+                        <div className="input-group">
+                            <span className="input-group-text" id="basic-addon1"><i className="bi bi-search"></i></span>
+                            <input 
+                                type="text" 
+                                className="form-control" 
+                                placeholder="Buscar asignatura..." 
+                                aria-label="Buscar"
+                                aria-describedby="basic-addon1"
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </Col>
+                    <Col>
+                        <select className="form-select" onChange={(e) => setFilterLevel(e.target.value)}>
+                            <option value="">Seleccionar Nivel</option>
+                            {[...Array(11).keys()].map(n => (
+                                <option key={n+1} value={n+1}>{n+1}</option>
+                            ))}
+                        </select>
+                    </Col>
+                    <Col>
+                        <select className="form-select" onChange={(e) => setSortOption(e.target.value)}>
+                            <option value="level">Ordenar por Nivel</option>
+                            <option value="name">Ordenar por Nombre</option>
+                            {/* Agrega aquí más opciones si es necesario */}
+                        </select>
+                    </Col>
+                </Row>
+
                 <Row className="justify-content-center" style={{width: '1500px'}}>
                     <Col lg={6} className="mb-4">
                         <div className="p-4 bg-teal text-white rounded shadow">
                             <h2>Asignaturas</h2>
-                            {subjects.length > 0 ? (
+                            {filteredSubjects.length > 0 ? (
                                 <Table hover variant="light">
                                 <thead>
                                     <tr>
-                                    <th style={{backgroundColor: '#f0ad4e'}}>Nombre</th>
+                                    <th style={{backgroundColor: '#f0ad4e'}}>Nombre asignatura</th>
+                                    <th style={{backgroundColor: '#f0ad4e'}}>Nivel</th>
                                     <th style={{backgroundColor: '#f0ad4e'}}>Ingresar horario</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {subjects.map(subject => (
+                                    {filteredSubjects.map(subject => (
                                     <tr key={subject.id_plan}>
                                         <td>{subject.subject_name}</td>
+                                        <td>{subject.level}</td>
                                         <td><Button variant="primary" onClick={() => handleOpenModal(subject)}>Ingresar horario</Button></td>
                                     </tr>
                                     ))}

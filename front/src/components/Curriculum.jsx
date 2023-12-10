@@ -16,6 +16,8 @@ function Curriculum() {
 
     const [approvedSubjects, setApprovedSubjects] = useState([]);
     const [reprovedSubjects, setReprovedSubjects] = useState([]);
+    const [enrolledSubjects, setEnrolledSubjects] = useState([]);
+    const [subjectsToEnroll, setSubjectsToEnroll] = useState([]);
 
     useEffect(() => {
         //Student
@@ -30,17 +32,44 @@ function Curriculum() {
             console.log(response.data);
             setSubjects(response.data);
             axios.get('http://localhost:8080/grades/approved/' + rut)
-            .then(response => {
-                setApprovedSubjects(response.data);
-                console.log(response.data);
-
-                axios.get('http://localhost:8080/grades/failed/' + rut)
                 .then(response => {
-                    setReprovedSubjects(response.data);
+                    setApprovedSubjects(response.data);
                     console.log(response.data);
-                });
+
+                    axios.get('http://localhost:8080/grades/failed/' + rut)
+                        .then(response => {
+                            setReprovedSubjects(response.data);
+                            console.log(response.data);
+
+                        axios.get('http://localhost:8080/grades/enrolled/' + rut)
+                            .then(response => {
+                                setEnrolledSubjects(response.data);
+                                console.log(response.data);
+
+                                //Se obtienen los prerequisitos
+                                axios.get('http://localhost:8080/prerequisites/' + rut)
+                                    .then(response => {
+                                        console.log(response.data);
+                                        const prerequisites = response.data;
+                                        axios.post('http://localhost:8080/study_plans/prerequisites', prerequisites)
+                                            .then(response => {
+                                                const sortedSubjects = response.data.sort((a, b) => a.level - b.level);
+                                                console.log("Subjects to enroll: ", sortedSubjects);
+                                                setSubjectsToEnroll(sortedSubjects);
+                                            })
+                                            .catch(error => {
+                                                console.log(error);
+                                            });
+                                    })
+                                    .catch(error => {
+                                        console.log(error);
+                                    });
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            });
+                    });
             });
-            axios.get('http://localhost:8080/grades/failed/' + rut)
         })
         .catch(error => {
             console.log(error);
@@ -66,11 +95,17 @@ function Curriculum() {
     const getStatusColor = (subject) => {
         const approved = approvedSubjects.some(approvedSubject => approvedSubject.id_subject === subject.id_subject);
         const reproved = reprovedSubjects.some(reprovedSubject => reprovedSubject.id_subject === subject.id_subject);
+        const enrolled = enrolledSubjects.some(enrolledSubject => enrolledSubject.id_subject === subject.id_subject);
+        const toEnroll = subjectsToEnroll.some(subjectToEnroll => subjectToEnroll.id_subject === subject.id_subject);
 
         if (approved) {
             return 'bg-pastel-green';   
         } else if (reproved) {
             return 'bg-pastel-red';
+        } else if (enrolled) {
+            return 'bg-pastel-yellow';
+        } else if (toEnroll){
+            return 'bg-pastel-blue';
         } else {
             return 'bg-pastel-white';
         }

@@ -31,4 +31,10 @@ public class Schedule_StudyPlanController {
             @PathVariable("id_subject") Integer id_subject){
         return ResponseEntity.ok(scheduleStudyPlanService.deleteAllSchedulesByIdSubject(id_subject));
     }
+
+    @GetMapping("/{rut}")
+    public ResponseEntity<List<Schedule_StudyPlan>> getSchedulesByRut(
+            @PathVariable("rut") String rut){
+        return ResponseEntity.ok(scheduleStudyPlanService.getSchedulesByRut(rut));
+    }
 }
