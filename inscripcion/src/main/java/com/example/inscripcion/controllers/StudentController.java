@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -34,5 +35,15 @@ public class StudentController {
     @GetMapping("/maxsubjects/{rut}")
     public ResponseEntity<Integer> getMaxNumberOfSubjectsByRut(@PathVariable("rut") String rut){
         return ResponseEntity.ok(studentService.getMaxNumberOfSubjectsByRut(rut));
+    }
+
+    @PutMapping("/status/{rut}")
+    public ResponseEntity<Student> setStudentStatus(@PathVariable("rut") String rut){
+        return ResponseEntity.ok(studentService.setStudentStatus(rut));
+    }
+
+    @GetMapping("/get_status/{rut}")
+    public ResponseEntity<Boolean> getStatusByRut(@PathVariable("rut") String rut){
+        return ResponseEntity.ok(studentService.getStudentStatus(rut));
     }
 }

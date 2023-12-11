@@ -2,6 +2,7 @@ package com.example.inscripcion.services;
 
 import com.example.inscripcion.entities.Grade;
 import com.example.inscripcion.entities.Prerequisite;
+import com.example.inscripcion.entities.Student;
 import com.example.inscripcion.entities.StudyPlan;
 import com.example.inscripcion.repositories.StudyPlanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,10 @@ public class StudyPlanService {
         }
 
         return studyPlans;
+    }
+
+    public Integer getLevelOfSubject(Integer id_subject){
+        return studyPlanRepository.getStudyPlanLevelById_Subject(id_subject);
     }
 
 }

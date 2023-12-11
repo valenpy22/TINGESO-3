@@ -1,12 +1,15 @@
 package com.example.inscripcion.services;
 
 import com.example.inscripcion.entities.Grade;
+import com.example.inscripcion.entities.StudyPlan;
 import com.example.inscripcion.repositories.GradeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class GradeService {
@@ -122,6 +125,35 @@ public class GradeService {
         return gradeRepository.getGradesByRut(rut).stream()
                 .filter(g -> "Inscrita".equals(g.getStatus()))
                 .toList();
+    }
+
+    public boolean isRegularStudentByGrades(String rut){
+        List<Grade> grades = getGradesByRut(rut);
+        Map<Integer, Integer> failedSubjects = new HashMap<>();
+
+        for(Grade grade : grades){
+            if(grade.getGrade() < 4){
+                failedSubjects.put(grade.getId_subject(), failedSubjects.getOrDefault(grade.getId_subject(), 0) + 1);
+            }
+        }
+
+        for(Map.Entry<Integer, Integer> entry : failedSubjects.entrySet()){
+            int idSubject = entry.getKey();
+            int timesFailed = entry.getValue();
+
+            int level = studyPlanService.getLevelOfSubject(idSubject);
+
+            if((level != 1 && timesFailed >= 1) || (level == 1 && timesFailed >= 2)){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public List<StudyPlan> getEnrolledSubjects(String rut){
+        List<Grade> grades = getEnrolledGrades(rut);
+        return studyPlanService.getStudyPlanByGrades(grades);
     }
 
 }

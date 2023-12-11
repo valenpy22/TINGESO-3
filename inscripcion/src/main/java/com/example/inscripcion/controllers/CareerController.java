@@ -32,4 +32,9 @@ public class CareerController {
         return ResponseEntity.ok(careerService.getAllSubjectsByIdCareer(id_career));
     }
 
+    @GetMapping("/id/{id_career}")
+    public ResponseEntity<String> getCareerById(@PathVariable("id_career") Integer id_career){
+        return ResponseEntity.ok(careerService.getCareerNameById_career(id_career));
+    }
+
 }

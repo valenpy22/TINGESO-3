@@ -74,4 +74,19 @@ public class StudentService {
         return studyPlanService.countLevelsByIdCareer(id_career);
     }
 
+    public Student setStudentStatus(String rut){
+        Student student = studentRepository.findByRut(rut);
+        if(gradeService.isRegularStudentByGrades(rut)){
+            student.setStatus("Regular");
+        }else{
+            student.setStatus("Eliminado");
+        }
+
+        return studentRepository.save(student);
+    }
+
+    public boolean getStudentStatus(String rut){
+        return studentRepository.findByRut(rut).getStatus().equals("Regular");
+    }
+
 }

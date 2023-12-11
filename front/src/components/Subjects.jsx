@@ -19,12 +19,11 @@ function Subjects(){
         //Se obtiene la información de los prerrequisitos
         axios.get(`http://localhost:8080/prerequisites/${rut}`)
             .then(response => {
-                console.log("Prerequisites: ", response.data);
                 setPrerequisites(response.data);
 
                 axios.get(`http://localhost:8080/students/maxsubjects/${rut}`)
                     .then(response => {
-                        console.log("Max subjects: ", response.data);
+
                         setMaxSubjects(response.data);
                     })
                     .catch(error => {
@@ -39,7 +38,6 @@ function Subjects(){
     useEffect(() => {
         axios.get('http://localhost:8080/grades/enrolled/'+rut)
             .then(response => {
-                console.log("Grades: ", response.data);
                 setGrades(response.data);
             })
             .catch(error => {
@@ -54,7 +52,6 @@ function Subjects(){
             axios.post('http://localhost:8080/study_plans/prerequisites', prerequisites)
                 .then(response => {
                     const sortedSubjects = response.data.sort((a, b) => a.level - b.level);
-                    console.log("Subjects to enroll: ", sortedSubjects);
                     setSubjectsToEnroll(sortedSubjects);
                 })
                 .catch(error => {
@@ -68,11 +65,10 @@ function Subjects(){
             //Se obtiene la información de las asignaturas inscritas
             axios.post('http://localhost:8080/study_plans/grades', grades)
             .then(response => {
-                console.log("Subjects enrolled: ", response.data);
                 setSubjectsEnrolled(response.data);
                 axios.get('http://localhost:8080/schedules_studyplan/schedule/'+rut)
                     .then(response => {
-                        console.log("Schedules: ", response.data);
+
                     })
                     .catch(error => {
                         console.log(error);
@@ -83,7 +79,7 @@ function Subjects(){
                 console.log(error);
             });
         }
-    }, [grades]);
+    }, [grades, rut]);
 
     useEffect(() => {
         const loadSchedules = async () => {

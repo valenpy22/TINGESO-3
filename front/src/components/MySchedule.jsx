@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Card, Table, Container, Col} from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { Row, Card, Container, Col} from 'react-bootstrap';
 import Header from './Header';
 import axios from 'axios';
 import '../css/MySchedule.css';
@@ -41,7 +40,7 @@ function MySchedule(){
                 console.log(error);
             });
     
-    }, []);
+    }, [subjects]);
 
     useEffect(() => {
         // Solo generar colores si aún no se han asignado
@@ -52,7 +51,7 @@ function MySchedule(){
             });
             setSubjectColors(newSubjectColors);
         }
-    }, [subjects]);
+    }, [subjects, subjectColors]);
 
     
     const mapSchedulesToSubjects = (schedules, subjects) => {
@@ -81,6 +80,36 @@ function MySchedule(){
         }
         return "";
     };
+
+    const getDayNameFromBlockNumber = (blockNumber) => {
+        if(blockNumber >= 1 && blockNumber <= 9) return "L";
+        if(blockNumber >= 10 && blockNumber <= 18) return "M";
+        if(blockNumber >= 19 && blockNumber <= 27) return "W";
+        if(blockNumber >= 28 && blockNumber <= 36) return "J";
+        if(blockNumber >= 37 && blockNumber <= 45) return "V";
+        if(blockNumber >= 46 && blockNumber <= 54) return "S";
+        return null;
+    };
+
+    const getBlockNumberFromUniqueNumber = (uniqueBlockNumber) => {
+        return uniqueBlockNumber % 9 === 0 ? 9 : uniqueBlockNumber % 9;
+    };
+
+    const getBlockNameFromDayAndNumber = (block) => {
+        const dayName = getDayNameFromBlockNumber(block);
+        const blockNumber = getBlockNumberFromUniqueNumber(block);
+        return dayName + blockNumber;
+    };
+
+    const getScheduleNameFromSubject = (subject) => {
+        const subjectSchedules = schedules.filter((schedule) => schedule.id_subject === subject.id_subject);
+      
+        if (subjectSchedules.length === 0) return "Sin horario"; // O un mensaje adecuado cuando no haya horarios.
+      
+        const scheduleNames = subjectSchedules.map((schedule) => getBlockNameFromDayAndNumber(schedule.block));
+        return scheduleNames.join("-");
+      };
+      
     
     
     const dayBlockToUniqueNumber = (day, block) => {
@@ -92,15 +121,16 @@ function MySchedule(){
     
     const renderSubjectCards = () => {
         return subjects.map((subject, index) => (
-            <Col key={index} xs={12} md={6} lg={4} xl={3}>
+            <Col key={index} style={{minWidth: '100px', maxWidth: '300px'}}>
                 <Card className="mb-3">
                     <Card.Body>
                         <div className="subject-color" style={{ backgroundColor: subjectColors[subject.id_subject] }}>
                             <span className="subject-code">{subject.id_subject}</span>
                         </div>
-                        <Card.Title>{subject.subject_name}</Card.Title>
+                        <Card.Title style={{marginTop: '5px'}}>{subject.subject_name}</Card.Title>
                         <Card.Text>
-                            {subject.subject_name}
+                            <b>Horario: </b> 
+                            {getScheduleNameFromSubject(subject)}
                             {/* Aquí puedes mostrar más información de la asignatura */}
                         </Card.Text>
                     </Card.Body>
@@ -112,28 +142,32 @@ function MySchedule(){
     return (
         <>
             <Header />
-            <Container>
+            <div>
                 <Row>
-                    <Container className="items-align-center text-center">
-                        <h1>Mi horario</h1>
-                        <div className="schedule-grid">
-                            <div className="hour">#</div>
-                            {days.map(day => <div className="hour" key={day}>{day}</div>)}
-                            {blocks.map((block, index) => (
-                                <React.Fragment key={block}>
-                                    <div className="hour">{hours[index]}</div>
-                                    {daysAbbr.map(day => (
-                                        <div key={day + block} className="schedule-cell">
-                                            {getSubjectForBlock(day, parseInt(block))}
-                                        </div>
-                                    ))}
-                                </React.Fragment>
-                            ))}
-                        </div>
-                    </Container>
-                    {renderSubjectCards()}
+                    <Col md={8} style={{marginLeft: '140px'}}>
+                        <Container className="items-align-center text-center">
+                            <h1 style={{marginTop: '20px'}}>Mi horario</h1>
+                            <div className="schedule-grid">
+                                <div className="hour">#</div>
+                                {days.map(day => <div className="hour" key={day}><b>{day}</b></div>)}
+                                {blocks.map((block, index) => (
+                                    <React.Fragment key={block}>
+                                        <div className="hour"><b>{hours[index]}</b></div>
+                                        {daysAbbr.map(day => (
+                                            <div key={day + block} className="schedule-cell">
+                                                {getSubjectForBlock(day, parseInt(block))}
+                                            </div>
+                                        ))}
+                                    </React.Fragment>
+                                ))}
+                            </div>
+                        </Container>
+                    </Col>
+                    <Col style={{marginTop: '74px'}}>
+                        {renderSubjectCards()}
+                    </Col>
                 </Row>
-            </Container>
+            </div>
         </>
     );
 }

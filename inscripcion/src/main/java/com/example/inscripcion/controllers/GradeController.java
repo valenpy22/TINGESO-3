@@ -1,6 +1,7 @@
 package com.example.inscripcion.controllers;
 
 import com.example.inscripcion.entities.Grade;
+import com.example.inscripcion.entities.StudyPlan;
 import com.example.inscripcion.services.GradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -46,5 +47,15 @@ public class GradeController {
     public ResponseEntity<List<Grade>> deleteGradeByRut(
             @PathVariable("rut") String rut, @PathVariable("id_subject") Integer id_subject){
         return ResponseEntity.ok(gradeService.deleteGradeByRut(rut, id_subject));
+    }
+
+    @GetMapping("/signedup/{rut}")
+    public ResponseEntity<Boolean> isRegularStudent(@PathVariable("rut") String rut){
+        return ResponseEntity.ok(gradeService.isRegularStudentByGrades(rut));
+    }
+
+    @GetMapping("/enrolled_subjects/{rut}")
+    public ResponseEntity<List<StudyPlan>> getEnrolledSubjectsByRut(@PathVariable("rut") String rut){
+        return ResponseEntity.ok(gradeService.getEnrolledSubjects(rut));
     }
 }
