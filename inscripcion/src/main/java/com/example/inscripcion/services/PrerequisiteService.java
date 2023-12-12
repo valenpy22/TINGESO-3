@@ -92,4 +92,13 @@ public class PrerequisiteService {
         return new ArrayList<>(uniquePrerequisitesMap.values());
     }
 
+    public Prerequisite savePrerequisite(Prerequisite prerequisite){
+        Prerequisite p = new Prerequisite();
+        p.setId_prerequisite(prerequisite.getId_prerequisite());
+        p.setId_subject(prerequisite.getId_subject());
+        p.setStatus(prerequisite.getStatus());
+
+        prerequisiteRepository.save(p);
+    }
+
 }

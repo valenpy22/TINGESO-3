@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/students")
@@ -50,5 +47,10 @@ public class StudentController {
     @GetMapping("/average_score/{rut}")
     public ResponseEntity<Double> getAverageScoreByRut(@PathVariable("rut") String rut){
         return ResponseEntity.ok(studentService.getAverageScoreByRut(rut));
+    }
+
+    @PostMapping()
+    public ResponseEntity<Student> saveStudent(@RequestBody Student student){
+        return ResponseEntity.ok(studentService.saveStudent(student));
     }
 }
