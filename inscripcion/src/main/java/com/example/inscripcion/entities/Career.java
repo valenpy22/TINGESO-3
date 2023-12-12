@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Career {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id_career;
     private String career_name;
 }

@@ -98,7 +98,7 @@ public class PrerequisiteService {
         p.setId_subject(prerequisite.getId_subject());
         p.setStatus(prerequisite.getStatus());
 
-        prerequisiteRepository.save(p);
+        return prerequisiteRepository.save(p);
     }
 
 }
