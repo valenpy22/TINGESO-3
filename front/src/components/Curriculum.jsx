@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Container} from 'react-bootstrap';
+import {Container} from 'react-bootstrap';
 import {createGlobalStyle} from 'styled-components';
 import Header from './Header';
 import axios from 'axios';
 
 function Curriculum() {
+    const [isLoading, setIsLoading] = useState(true);
+
     const rut = localStorage.getItem('rut');
 
     const [subjects, setSubjects] = useState([]);
@@ -17,7 +19,13 @@ function Curriculum() {
     const [subjectsToEnroll, setSubjectsToEnroll] = useState([]);
     const [careerName, setCareerName] = useState('');
 
+    const [fakeLoading, setFakeLoading] = useState(true);
+
     useEffect(() => {
+
+        setIsLoading(true);
+        setFakeLoading(true);
+
         //Student
         axios.get('http://localhost:8080/students/student/'+rut)
         .then(response => {
@@ -28,6 +36,7 @@ function Curriculum() {
                 })
                 .catch(error => {
                     console.log(error);
+                    setIsLoading(false);
                 });
             return axios.get('http://localhost:8080/careers/subjects/' + response.data.id_career);
         })
@@ -68,6 +77,7 @@ function Curriculum() {
                             });
                     });
             });
+
         })
         .catch(error => {
             console.log(error);
@@ -77,12 +87,28 @@ function Curriculum() {
         axios.get('http://localhost:8080/students/'+rut)
         .then(response => {
             setMaxLevels(response.data);
+            setIsLoading(false);
         })
         .catch(error => {
             console.log(error);
+            setIsLoading(false);
         });
+
+        setTimeout(() => {
+            setFakeLoading(false);
+        }, 600);
     
     }, [rut]);
+
+    if(isLoading || fakeLoading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only"></span>
+                </div>
+            </div>
+        );
+    }
 
     let levels = [];
     for (let i = 1; i <= maxLevels; i++) {
@@ -117,12 +143,13 @@ function Curriculum() {
         <div>
             <Header/>
             <GlobalStyles />
+            
             <Container>
                 <h1 className="text-center my-4">Malla curricular</h1>
                 <h3 className="text-center my-4">{student.id_career} - {careerName}</h3>
                 <div style={{ display: 'grid', textAlign: 'center', gap: '1px'}}>
                     {levels.map(level => (
-                        <div key={`header-${level}`} style={{ gridColumn: level, gridRow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#00a499', border: '1px solid black',  height: '40px'}}>
+                        <div key={`header-${level}`} style={{ gridColumn: level, gridRow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#00a499',  height: '40px'}}>
                             Nivel {level}
                         </div>
                     ))}
@@ -132,11 +159,13 @@ function Curriculum() {
                                 <div style={{
                                     gridColumn: level,
                                     gridRow: subjectIndex + 2,
-                                    border: '1px solid black', 
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    height: '120px'
+                                    height: '115px',
+                                    width: '100%',
+                                    borderRadius: '5px',
+                                    cursor: 'pointer'
                                 }} className={getStatusColor(subject)} key={`subject-${levelIndex}-${subjectIndex}`}>
                                     {subject.subject_name}
                                 </div>
@@ -153,7 +182,7 @@ export default Curriculum;
 
 const GlobalStyles = createGlobalStyle`
 .bg-pastel-green {
-    background-color: #64b369; /* Verde pastel suave */
+    background-color: #34a853; /* Verde pastel suave */
     color: white;
 }
 
@@ -163,7 +192,7 @@ const GlobalStyles = createGlobalStyle`
 }
 
 .bg-pastel-red {
-    background-color: #ff6f6f; /* Rojo pastel suave */
+    background-color: #dc3545; /* Rojo pastel suave */
     color: white;
 }
 
@@ -173,7 +202,7 @@ const GlobalStyles = createGlobalStyle`
 }
 
 .bg-pastel-white {
-    background-color: #f5f5f5; /* Blanco pastel suave */
+    background-color: #e6e6e6; /* Blanco pastel suave */
     color: black;
 }
 `;

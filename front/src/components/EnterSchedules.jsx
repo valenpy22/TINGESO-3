@@ -20,8 +20,12 @@ function EnterSchedules() {
     const [sortOption, setSortOption] = useState("level");
     const [schedules, setSchedules] = useState({});
 
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+
 
     useEffect(() => {
+        
         axios.get('http://localhost:8080/careers/'+selectedCareer)
         .then(response => {
             setSubjects(response.data);
@@ -29,6 +33,7 @@ function EnterSchedules() {
         .catch(error => {
             console.log(error);
         });
+
     }, [selectedCareer]);
 
     useEffect(() => {
@@ -58,10 +63,10 @@ function EnterSchedules() {
     const blockNumberMapping = {
         "Lunes": 1,
         "Martes": 10,
-        "Miercoles": 19,
+        "Miércoles": 19,
         "Jueves": 28,
         "Viernes": 37,
-        "Sabado": 46
+        "Sábado": 46
     };
 
     const getUniqueBlockNumber = (day, block) => {
@@ -103,10 +108,15 @@ function EnterSchedules() {
                 console.log('Success:', response.data);
                 setShowModal(false);
 
+                setShowSuccessMessage(true);
+
                 setSchedules(prevSchedules => ({
                     ...prevSchedules,
                     [selectedSubject.id_subject]: scheduleStudyPlans
                 }));
+
+                setTimeout(() => setShowSuccessMessage(false), 3000);
+
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -157,10 +167,10 @@ function EnterSchedules() {
     const getDayNameFromBlockNumber = (blockNumber) => {
         if(blockNumber >= 1 && blockNumber <= 9) return "Lunes";
         if(blockNumber >= 10 && blockNumber <= 18) return "Martes";
-        if(blockNumber >= 19 && blockNumber <= 27) return "Miercoles";
+        if(blockNumber >= 19 && blockNumber <= 27) return "Miércoles";
         if(blockNumber >= 28 && blockNumber <= 36) return "Jueves";
         if(blockNumber >= 37 && blockNumber <= 45) return "Viernes";
-        if(blockNumber >= 46 && blockNumber <= 54) return "Sabado";
+        if(blockNumber >= 46 && blockNumber <= 54) return "Sábado";
         return null;
     };
 
@@ -258,7 +268,7 @@ function EnterSchedules() {
                     </Col>
                 </Row>
 
-                <Row className="justify-content-center" style={{width: '1500px'}}>
+                <Row className="justify-content-center" style={{width: '1800px'}}>
                     <Col lg={6} className="mb-4">
                         <div className="p-4 bg-teal text-white rounded shadow">
                             <h2>Asignaturas</h2>
@@ -310,14 +320,15 @@ function EnterSchedules() {
                                 <tr key={block}>
                                     <td style={{backgroundColor: '#00a499'}}>{block}</td>
                                     {days.map(day => (
-                                        <td key={day}>
+                                        <td key={day} style={{padding: 0, }}>
                                             <Button 
                                                 variant="outline-primary" 
                                                 style={{ 
                                                     backgroundColor: selectedSlots?.[day]?.[block] ? 'green' : 'transparent',
                                                     border: 'none',
                                                     width: '100%',
-                                                    height: '30px'
+                                                    height: '40px',
+                                                    borderRadius: '0px'
                                                 }}
                                                 onClick={() => handleSelectSlot(day, block)}
                                             />
@@ -337,6 +348,11 @@ function EnterSchedules() {
                     </Container>
                 </Modal.Body>
             </Modal>
+            {showSuccessMessage && (
+                <div style={{ position: 'fixed', bottom: '20px', right: '20px', backgroundColor: 'green', color: 'white', padding: '10px', borderRadius: '5px' }}>
+                    ¡Horario guardado con éxito!
+                </div>
+            )}
         </>
     );
 }

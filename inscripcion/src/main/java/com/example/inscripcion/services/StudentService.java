@@ -89,4 +89,18 @@ public class StudentService {
         return studentRepository.findByRut(rut).getStatus().equals("Regular");
     }
 
+    public Double getAverageScoreByRut(String rut){
+        List<Grade> grades = gradeService.getGradesByRut(rut);
+        Double suma = 0.0;
+        for(Grade grade : grades){
+            suma += grade.getGrade();
+        }
+
+        if(!grades.isEmpty()){
+            return suma/grades.size();
+        }else{
+            return 0.0;
+        }
+    }
+
 }

@@ -7,33 +7,48 @@ import axios from 'axios';
 function Student() {
     const navigate = useNavigate();
     const [rut, setRut] = useState('');
+    const [error, setError] = useState('');
 
     const handleRutChange = (e) => {
         setRut(e.target.value);
+
+        if(error){
+            setError('');
+        }
     };
 
     const handleLogin = (rut) => {
-        axios.put('http://localhost:8080/students/status/'+rut)
+        axios.get('http://localhost:8080/students/exists/'+rut)
         .then(response => {
-            console.log(response);
-
-            axios.get('http://localhost:8080/students/get_status/'+rut)
+            const exists = response.data;
+            if(exists){
+                axios.put('http://localhost:8080/students/status/'+rut)
                 .then(response => {
-                    console.log(response);
-                    const regular = response.data;
-                    if(!regular){
-                        localStorage.setItem('rut', rut);
-                        navigate('/curriculum');
-                    }else{
-                        alert('Estimado estudiante, usted se encuentra eliminado de la carrera, por lo que no puede acceder a su curriculum');
-                    }
+                    axios.get('http://localhost:8080/students/get_status/'+rut)
+                        .then(response => {
+                            const regular = response.data;
+                            if(!regular){
+                                localStorage.setItem('rut', rut);
+                                navigate('/curriculum');
+                            }else{
+                                alert('Estimado estudiante, usted se encuentra eliminado de la carrera, por lo que no puede acceder a su curriculum');
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
                 })
                 .catch(error => {
                     console.log(error);
                 });
+                
+            }else{
+                setError('Ingrese un RUT válido')
+            }
         })
         .catch(error => {
             console.log(error);
+            setError('Ingrese un RUT');
         });
     };
 
@@ -50,7 +65,15 @@ function Student() {
                         <Form>
                             <Form.Group className="mb-3">
                                 <Form.Label>RUT</Form.Label>
-                                <Form.Control type="text" placeholder="Ingrese su RUT" value={rut} onChange={handleRutChange} />
+                                    <Form.Control 
+                                    type="text" 
+                                    placeholder="Ingrese su RUT" 
+                                    value={rut} 
+                                    onChange={handleRutChange}
+                                    isInvalid={!!error} />
+                                    <Form.Control.Feedback type="invalid">
+                                        {error}
+                                    </Form.Control.Feedback>
                             </Form.Group>
                             <Container className="d-flex justify-content-center">
                                 <Button variant="secondary" onClick={handleBack} className="me-2">

@@ -1,8 +1,6 @@
 package com.example.inscripcion.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Career {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id_career;
     private String career_name;
 }

@@ -29,6 +29,10 @@ function Teacher(){
         navigate('/enterschedules', {state: {selectedCareer}});
     };
 
+    const handleBack = () => {
+        navigate('/login'); // Cambia '/login' por la ruta correcta de tu página de login
+    };
+
     return(
         <>
             <HeaderTeacher/>
@@ -48,7 +52,7 @@ function Teacher(){
                             </Form.Select>
                         </Form.Group>
                         <Container className="d-flex justify-content-end">
-                            <Button variant="secondary" className="me-2">
+                            <Button variant="secondary" className="me-2" onClick={handleBack}>
                                 Volver
                             </Button>
                             <Button variant="primary" onClick={handleCareerSelection}>

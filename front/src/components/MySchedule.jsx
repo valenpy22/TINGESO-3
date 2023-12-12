@@ -19,17 +19,18 @@ function MySchedule(){
 
     const [subjectColors, setSubjectColors] = useState({});
 
-
     const generatePastelColor = () => {
         const hue = Math.floor(Math.random() * 360);
         return `hsl(${hue}, 100%, 80%)`;
     };
 
     useEffect(() => {
+
         axios.get('http://localhost:8080/grades/enrolled_subjects/'+localStorage.getItem('rut'))
             .then(response => {
                 const fetchedSubjects = response.data;
                 setSubjects(fetchedSubjects);
+
                 return axios.get('http://localhost:8080/schedules_studyplan/schedule/'+localStorage.getItem('rut'));
             })
             .then(response => {
@@ -38,8 +39,9 @@ function MySchedule(){
             })
             .catch(error => {
                 console.log(error);
+
             });
-    
+
     }, [subjects]);
 
     useEffect(() => {
@@ -51,6 +53,7 @@ function MySchedule(){
             });
             setSubjectColors(newSubjectColors);
         }
+
     }, [subjects, subjectColors]);
 
     
@@ -116,8 +119,6 @@ function MySchedule(){
         const dayMapping = { "L": 1, "M": 10, "W": 19, "J": 28, "V": 37, "S": 46 };
         return dayMapping[day] + block - 1;
     };
-
-    
     
     const renderSubjectCards = () => {
         return subjects.map((subject, index) => (

@@ -26,6 +26,11 @@ public class CareerService {
     }
 
     public List<Career> getAllCareers(){
+        int i = 0;
+        for(Career career : careerRepository.findAll()){
+            System.out.println(i);
+            i++;
+        }
         return careerRepository.findAll();
     }
 
@@ -39,5 +44,12 @@ public class CareerService {
 
     public List<StudyPlan> getAllSubjectsByIdCareer(Integer id_career){
         return studyPlanService.getStudyPlansById_career(id_career);
+    }
+
+    public Career save(String career_name){
+        Career career = new Career();
+        career.setCareer_name(career_name);
+        System.out.println(career.getId_career());
+        return careerRepository.save(career);
     }
 }

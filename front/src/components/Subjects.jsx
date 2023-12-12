@@ -1,8 +1,9 @@
-import { Button, Table, Container, Row, Col } from "react-bootstrap";
+import { Button, Table, Container, Row, Col, Alert } from "react-bootstrap";
 import React from "react";
 import Header from "./Header.jsx";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import '../css/Subjects.css';
 
 function Subjects(){
     const student = JSON.parse(localStorage.getItem('student'));
@@ -15,7 +16,18 @@ function Subjects(){
     const [subjectsEnrolled, setSubjectsEnrolled] = useState([]);
     const [schedules, setSchedules] = useState([]);
 
-    useEffect(() => {        
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+    const [showDangerMessage, setShowDangerMessage] = useState(false);
+
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+
+    const [isLoading, setIsLoading] = useState(true);
+    const [fakeLoading, setFakeLoading] = useState(true);
+
+    useEffect(() => {     
+        setIsLoading(true);
+        setFakeLoading(true);   
         //Se obtiene la información de los prerrequisitos
         axios.get(`http://localhost:8080/prerequisites/${rut}`)
             .then(response => {
@@ -25,6 +37,7 @@ function Subjects(){
                     .then(response => {
 
                         setMaxSubjects(response.data);
+                        setIsLoading(false);
                     })
                     .catch(error => {
                         console.log(error);
@@ -32,7 +45,13 @@ function Subjects(){
             })
             .catch(error => {
                 console.log(error);
+                setIsLoading(false);
             });
+
+        setTimeout(() => {
+            setFakeLoading(false);
+        }, 600);
+
     }, [rut]);
     
     useEffect(() => {
@@ -94,27 +113,24 @@ function Subjects(){
                 }
             }
 
+            localStorage.setItem('schedules', JSON.stringify(newSchedules));
             setSchedules(newSchedules);
+
         };
 
         loadSchedules();
     }, [subjectsToEnroll, subjectsEnrolled]);
 
     const handleSubmit = (id_subject) => {
-        if(subjectsEnrolled.length < 1){
-            alert("Debes inscribir al menos 3 asignaturas");
-        };
 
         //Se obtienen los horarios de las asignaturas inscritas
         axios.get('http://localhost:8080/schedules_studyplan/schedule/'+rut)
             .then(response => {
-                console.log("Schedules: ", response.data);
                 const enrolledSchedules = response.data;
 
                 //Se obtiene los horarios de la asignatura por inscribir
                 axios.get(`http://localhost:8080/schedules_studyplan/${id_subject}`)
                     .then(response => {
-                        console.log("Schedule: ", response.data);
                         const schedule = response.data;
                         if(compareSchedules(enrolledSchedules, schedule)){
                             alert("No puedes inscribir esta asignatura, ya que se cruza con otra asignatura inscrita");
@@ -132,8 +148,15 @@ function Subjects(){
                                         setSubjectsToEnroll(updatedSubjectsToEnroll);
 
                                         if(enrolledSubject){
-                                            setSubjectsEnrolled([...subjectsEnrolled, enrolledSubject]);
+                                            const newSubjectsEnrolled = [...subjectsEnrolled, enrolledSubject];
+                                            newSubjectsEnrolled.sort((a, b) => a.level - b.level);
+                                            localStorage.setItem('subjectsEnrolled', JSON.stringify(newSubjectsEnrolled));
+                                            setSubjectsEnrolled(newSubjectsEnrolled);
                                         };
+
+                                        setShowSuccessMessage(true);
+
+                                        setTimeout(() => setShowSuccessMessage(false), 3000);
                                     })
                                     .catch(error => {
                                         console.error('Error:', error);
@@ -145,7 +168,14 @@ function Subjects(){
                     })
                     .catch(error => {
                         console.log(error);
-                    });    
+                    });  
+                    
+                if(subjectsEnrolled.length >= maxSubjects){
+                    setAlertMessage("No puedes inscribir más asignaturas");
+                    setShowAlert(true);
+                    setTimeout(() => setShowAlert(false), 3000);
+                    return;
+                }
             })
             .catch(error => {
                 console.log(error);
@@ -177,8 +207,14 @@ function Subjects(){
                 setSubjectsEnrolled(updatedEnrolledSubjects);
 
                 if(unenrolledSubject){
-                    setSubjectsToEnroll([...subjectsToEnroll, unenrolledSubject]);
+                    const newSubjectsToEnroll = [...subjectsToEnroll, unenrolledSubject];
+                    newSubjectsToEnroll.sort((a, b) => a.level - b.level);
+                    setSubjectsToEnroll(newSubjectsToEnroll);
                 }
+
+                setShowDangerMessage(true);
+
+                setTimeout(() => setShowDangerMessage(false), 3000);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -209,12 +245,29 @@ function Subjects(){
         const subjectSchedules = schedules[subject.id_subject];
         if (!subjectSchedules) return null;
         const scheduleNames = subjectSchedules.map(schedule => getBlockNameFromDayAndNumber(schedule.block));
-        return scheduleNames.join("");
+        const scheduleName = scheduleNames.join("-");
+        localStorage.setItem('scheduleName', JSON.stringify(scheduleName));
+        return scheduleName;
     };
+
+    if(isLoading || fakeLoading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only"></span>
+                </div>
+            </div>
+        );
+    }
 
     return(
         <>
             <Header />
+            {showAlert && (
+                <Alert variant="warning" onClose={() => setShowAlert(false)} dismissible>
+                    {alertMessage}
+                </Alert>
+            )}
             <Container className="mt-4">
                 <h1 className="text-center mb-4">Inscripción de asignaturas</h1>
                 <Row>
@@ -243,7 +296,7 @@ function Subjects(){
                                 </tbody>
                                 </Table>
                             ) : (
-                                <div>No hay asignaturas por inscribir</div>
+                                <h4 style={{ color: 'black !important' }}>No hay asignaturas por inscribir</h4>
                             )}
                         </div>
                     </Col>
@@ -272,12 +325,30 @@ function Subjects(){
                                 </tbody>
                                 </Table>
                             ) : (
-                                <div>No hay asignaturas inscritas</div>
+                                <div>
+                                    <h4 className="black-text text-center py-4">No hay asignaturas inscritas</h4>
+                                </div>
                             )}
                         </div>
                     </Col>
                 </Row>
             </Container>
+            {showAlert && (
+                <div style={{ position: 'fixed', bottom: '20px', right: '20px', backgroundColor: '#ffc107', color: 'black', padding: '10px', borderRadius: '5px' }}>
+                    {alertMessage}
+                </div>
+            )}
+            {showSuccessMessage && (
+                <div style={{ position: 'fixed', bottom: '20px', right: '20px', backgroundColor: 'green', color: 'white', padding: '10px', borderRadius: '5px' }}>
+                    ¡Asignatura inscrita con éxito!
+                </div>
+            )}
+
+            {showDangerMessage && (
+                <div style={{ position: 'fixed', bottom: '20px', left: '20px', backgroundColor: '#dc3545', color: 'white', padding: '10px', borderRadius: '5px' }}>
+                    ¡Asignatura desinscrita con éxito!
+                </div>
+            )}
         </>
     );
 }

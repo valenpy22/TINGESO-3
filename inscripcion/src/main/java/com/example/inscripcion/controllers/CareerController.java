@@ -37,4 +37,9 @@ public class CareerController {
         return ResponseEntity.ok(careerService.getCareerNameById_career(id_career));
     }
 
+    @PostMapping("/name/{career_name}")
+    public ResponseEntity<Career> saveCareer(@PathVariable("career_name") String career_name){
+        return ResponseEntity.ok(careerService.save(career_name));
+    }
+
 }

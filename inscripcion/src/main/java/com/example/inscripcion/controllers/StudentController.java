@@ -46,4 +46,9 @@ public class StudentController {
     public ResponseEntity<Boolean> getStatusByRut(@PathVariable("rut") String rut){
         return ResponseEntity.ok(studentService.getStudentStatus(rut));
     }
+
+    @GetMapping("/average_score/{rut}")
+    public ResponseEntity<Double> getAverageScoreByRut(@PathVariable("rut") String rut){
+        return ResponseEntity.ok(studentService.getAverageScoreByRut(rut));
+    }
 }
